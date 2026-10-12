@@ -1,10 +1,12 @@
-<!DOCTYPE html><html lang="en"><head>
-  <meta name="google-site-verification" content="kYoBcBIm22M2xgitqvQ0jXZCu6LyvWVvSPwOIZeTgu4" />
-  <meta charset="utf-8">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Pakistan 3D Physical Map | Interactive Geography Atlas</title>
-<meta name="description" content="Explore Pakistan through an interactive 3D physical map. Discover mountain ranges, rivers, plateaus, plains, and geographical features for Pakistan Studies.">
-<meta name="robots" content="index, follow">
+<title>Pakistan 3D Topography Map – Interactive Relief Atlas for Pakistan Studies</title>
+<meta name="description" content="Free interactive 3D map of Pakistan: mountains, rivers, glaciers, deserts, plateaus, forests, borders and the LOC. Made for Pakistan Studies students.">
+<meta name="keywords" content="3D map of Pakistan, Pakistan topography, Pakistan physical map, Pakistan Studies, rivers of Pakistan, mountains of Pakistan, glaciers, plateaus, deserts, Indus delta, Line of Control">
+<link rel="canonical" href="https://mintymustafa-hub.github.io/Pakistan_Map-3d/">
+<meta property="og:type" content="website"><meta property="og:title" content="Pakistan 3D Topography Map"><meta property="og:description" content="Explore Pakistan's mountains, rivers, glaciers, deserts, plateaus, forests and borders in an interactive 3D map for Pakistan Studies."><meta property="og:url" content="https://mintymustafa-hub.github.io/Pakistan_Map-3d/">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Pakistan 3D Topography Map"><meta name="twitter:description" content="Interactive 3D map of Pakistan for Pakistan Studies students.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Pakistan 3D Topography Atlas","url":"https://mintymustafa-hub.github.io/Pakistan_Map-3d/","description":"Interactive 3D map of Pakistan showing mountains, rivers, glaciers, deserts, plateaus, forests, neighbouring countries, borders and the Line of Control, for Pakistan Studies students.","applicationCategory":"EducationalApplication","operatingSystem":"Any (web browser)","inLanguage":"en","isAccessibleForFree":true}</script>
 <style>
 :root{--bg:#dbe7ee;--pn:rgba(255,255,255,.93);--tx:#1d2a2f;--bd:#c9c3b6;--ac:#0e7c66;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1e2b;--pn:rgba(18,28,32,.93);--tx:#e6eeee;--bd:#34454a;--ac:#3ec9a7}}
@@ -14,12 +16,12 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 #lab{position:fixed;inset:0;pointer-events:none;overflow:hidden}
 .l{position:absolute;left:0;top:0;white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,0 0 5px #000;display:none}
 .l.big{font-size:15px;letter-spacing:2px;font-weight:700}.l.sea{color:#9fd8ff;font-style:italic;letter-spacing:3px;font-size:13px}
-.ui{position:fixed;left:8px;right:8px;background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:7px 10px}
+.ui{position:fixed;left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:7px 10px}
 #top{top:calc(8px + env(safe-area-inset-top,0px));font-weight:700}
 #top small{font-weight:400;opacity:.75;display:block}
 #infow{bottom:calc(58px + env(safe-area-inset-bottom,0px));line-height:1.35}#info{max-height:32vh;overflow:auto}
 .hd{display:flex;justify-content:space-between;align-items:center;gap:10px}.tg{border:1px solid var(--bd);background:transparent;color:var(--tx);border-radius:12px;padding:3px 10px;font:inherit;font-weight:400}
-#bar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;align-items:stretch;z-index:2}#bar #chips{position:static;flex:1;min-width:0}#tm,#rp{background:var(--pn);padding:9px 12px;white-space:nowrap}.lb{display:none}
+#bar{position:fixed;left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;align-items:stretch;z-index:2}#bar #chips{position:static;flex:1;min-width:0}#tm,#rp{background:var(--pn);padding:9px 12px;white-space:nowrap}.lb{display:none}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 #top.col{right:auto;width:auto}#top.col .ttl,#top.col small{display:none}
 #infow.col{left:auto;width:auto}#infow.col #info,#infow.col .hd b{display:none}
 #chips{bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;overflow-x:auto;padding:6px}
@@ -28,8 +30,10 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 #leg{top:calc(112px + env(safe-area-inset-top,0px));display:block;font-size:10px;line-height:1.5;padding:5px 8px}#leg div{display:inline-block;margin-right:9px;white-space:nowrap}body.tc #leg{top:calc(58px + env(safe-area-inset-top,0px))}#leg i{display:inline-block;width:12px;height:12px;border:1px solid #000;margin-right:6px;vertical-align:-2px}
 #info table{border-collapse:collapse;margin:6px 0}#info td{padding:2px 14px 2px 0;vertical-align:top}#info td:first-child{opacity:.7;white-space:nowrap}#info ul{margin:4px 0 0;padding-left:18px}
 @media(min-width:820px){#top{right:auto;width:290px}#infow{left:auto;right:8px;bottom:auto;top:calc(8px + env(safe-area-inset-top,0px));width:250px;font-size:12px}#info{max-height:calc(100vh - 150px)}#leg{right:auto;left:8px;top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:11px;line-height:1.55;padding:7px 10px}#leg div{display:block;margin:0}body.tc #leg{top:auto}#top.col,#infow.col{width:auto}.lb{display:inline}}
+@media(max-height:520px) and (orientation:landscape){#top{right:auto;width:auto;max-width:46vw}#top small{display:none}#infow{left:auto;right:calc(8px + env(safe-area-inset-right,0px));bottom:auto;top:calc(8px + env(safe-area-inset-top,0px));width:220px;font-size:11px}#info{max-height:calc(100vh - 78px)}#leg{right:auto;left:calc(8px + env(safe-area-inset-left,0px));top:calc(54px + env(safe-area-inset-top,0px));bottom:auto;width:auto;font-size:10px;line-height:1.4;padding:5px 8px}#leg div{display:block;margin:0}body.tc #leg{top:calc(54px + env(safe-area-inset-top,0px))}#chips{padding:3px 6px}.c{padding:4px 10px}#tm,#rp{padding:5px 10px}}
 </style></head><body>
-<canvas id="cv"></canvas><div id="lab"></div>
+<canvas id="cv"></canvas>
+<section class="sr"><h1>Pakistan 3D Topography Map</h1><p>An interactive 3D map of Pakistan for Pakistan Studies students. Rotate, zoom and pan the terrain, and switch layers on or off: mountains and peaks such as K2 and Nanga Parbat, rivers of the Indus system including the Jhelum, Chenab, Ravi, Sutlej and Kabul, the Indus Delta, glaciers such as Siachen and Baltoro, deserts such as Thar, Cholistan and Kharan, plateaus such as the Balochistan, Potohar and Deosai plateaus, forests, provinces and major cities. The map also shows neighbouring Afghanistan, Iran, China and India with border lengths, the Durand Line, the Line of Control, and the Arabian Sea coastline. Tap any label for notes. Boundaries and heights are approximate and intended as a study aid.</p></section><div id="lab"></div>
 <div class="ui" id="top"><div class="hd"><span class="ttl">Pakistan 3D Topography Atlas</span><button class="tg" id="tb">Hide</button></div><small>Drag: rotate · Pinch/scroll: zoom · Two fingers/right-drag: pan · Tap a label for notes · Zoom in for more labels</small></div>
 <div class="ui" id="infow"><div class="hd"><b>Notes</b><button class="tg" id="ib">Hide</button></div><div id="info"><b>Pakistan Studies map.</b> Heights are exaggerated; boundaries and features are approximate (study aid, not a survey map).</div></div>
 <div id="bar"><div class="ui" id="chips"></div><button class="c" id="rp" title="Report a mistake"><span>⚑ Report</span><span class="lb"> a mistake</span></button><button class="c" id="tm"></button></div><div class="ui" id="leg"></div>
@@ -198,7 +202,7 @@ const NAMES={relief:'Relief colours',rivers:'Rivers',mountains:'Mountains',plate
 const ch=document.getElementById('chips'),inf=document.getElementById('info');
 function sync(){for(const b of ch.querySelectorAll('.c'))if(b.dataset.k)b.classList.toggle('on',!!on[b.dataset.k]);for(const k in G)G[k].visible=!!on[k];paint()}
 function btn(t,k,fn){const b=document.createElement('button');b.className='c';b.textContent=t;if(k)b.dataset.k=k;b.onclick=fn;ch.appendChild(b)}
-btn('Show all',0,()=>{for(const k in on)on[k]=1;sync()});btn('Hide all',0,()=>{for(const k in on)on[k]=0;sync()});btn('Legend',0,()=>{const l=document.getElementById('leg');l.style.display=getComputedStyle(l).display=='none'?'block':'none'});btn('Reset view',0,()=>{A=0;El=.95;R=R0;T.set(7,0,-2)});
+btn('Show all',0,()=>{for(const k in on)on[k]=1;sync()});btn('Hide all',0,()=>{for(const k in on)on[k]=0;sync()});btn('Legend',0,()=>{const l=document.getElementById('leg');l.style.display=getComputedStyle(l).display=='none'?'block':'none'});btn('Reset view',0,()=>{A=0;El=.95;R=fit();touched=false;T.set(7,0,-2)});
 for(const k in NAMES)btn(NAMES[k],k,()=>{on[k]=on[k]?0:1;sync()});
 document.getElementById('rp').onclick=()=>window.open('https://docs.google.com/forms/d/e/1FAIpQLSfNAkK-8pXp4tmlfI_QvHiGPTU_uBNgM0t3RBMq-qqMM4o8CQ/viewform','_blank','noopener');
 const FACTS={'PAKISTAN':[['Area','796,096 km²'],['Population','≈ 241.5 million (2023 census)'],['Capital','Islamabad'],['Independence','14 August 1947'],['Coastline','≈ 1,046 km'],['Highest point','K2, 8,611 m']],
@@ -236,20 +240,20 @@ const tm=document.getElementById('tm'),rt=document.documentElement,isD=()=>rt.da
 function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);tm.innerHTML=isD()?'<span>\u2600</span><span class="lb"> Light</span>':'<span>\u263e</span><span class="lb"> Dark</span>'}
 tm.onclick=()=>{rt.dataset.theme=isD()?'light':'dark';theme()};matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);theme();
 /* camera */
-let A=0,El=.95,R=230,T=new V(7,0,-2),TH=[0,1e9,170,100,60];
-function size(){rd.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
+let A=0,El=.95,R=230,T=new V(7,0,-2),TH=[0,1e9,170,100,60],touched=false;const fit=()=>Math.min(480,Math.max(230,210/cam.aspect));
+function size(){rd.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();if(!touched)R=fit()}
 addEventListener('resize',size);size();R=Math.min(480,Math.max(230,210/cam.aspect));const R0=R;
 const P=new Map();let ld=0,lm=[0,0],moved=0;
 const ang=()=>{const a=[...P.values()];return Math.atan2(a[1][1]-a[0][1],a[1][0]-a[0][0])};let lang=0;
 const mid=()=>{const a=[...P.values()];return[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2,Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])]};
 function pan(dx,dy){const s=R*.0016;T.x-=Math.cos(A)*dx*s-Math.sin(A)*dy*s*-1;T.z+=-Math.sin(A)*dx*s*-1-Math.cos(A)*dy*s}
-cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY,e.button]);moved=0;if(P.size==2){const m=mid();lm=[m[0],m[1]];ld=m[2];lang=ang()}});
+cv.addEventListener('pointerdown',e=>{touched=true;cv.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY,e.button]);moved=0;if(P.size==2){const m=mid();lm=[m[0],m[1]];ld=m[2];lang=ang()}});
 cv.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);p[0]=e.clientX;p[1]=e.clientY;
 if(P.size==1){if(p[2]==2||e.shiftKey)pan(dx,dy);else{A-=dx*.006;El=Math.min(1.5,Math.max(.15,El+dy*.006))}}
 else if(P.size==2){const m=mid();R=Math.min(560,Math.max(28,R*ld/Math.max(1,m[2])));pan(m[0]-lm[0],m[1]-lm[1]);lm=[m[0],m[1]];ld=m[2]}});
 const up=e=>{if(P.size==1&&moved<8){let b=null,bd=1600;for(const l of LB)if(l.s&&l.info){const d=(l.sx-e.clientX)**2+(l.sy-e.clientY)**2;if(d<bd){bd=d;b=l}}if(b)show(b)}P.delete(e.pointerId)};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>P.delete(e.pointerId));
-cv.addEventListener('wheel',e=>{e.preventDefault();R=Math.min(560,Math.max(28,R*Math.exp(e.deltaY*.001)))},{passive:false});
+cv.addEventListener('wheel',e=>{touched=true;e.preventDefault();R=Math.min(560,Math.max(28,R*Math.exp(e.deltaY*.001)))},{passive:false});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 const v=new V();
 function frame(){cam.position.set(T.x+R*Math.cos(El)*Math.sin(A),T.y+R*Math.sin(El),T.z+R*Math.cos(El)*Math.cos(A));cam.lookAt(T);rd.render(sc,cam);
