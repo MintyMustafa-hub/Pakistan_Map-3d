@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pakistan 3D Topography Atlas</title>
+<style>
+:root{--bg:#dbe7ee;--pn:rgba(255,255,255,.93);--tx:#1d2a2f;--bd:#c9c3b6;--ac:#0e7c66;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1e2b;--pn:rgba(18,28,32,.93);--tx:#e6eeee;--bd:#34454a;--ac:#3ec9a7}}
+:root[data-theme="dark"]{--bg:#0b1e2b;--pn:rgba(18,28,32,.93);--tx:#e6eeee;--bd:#34454a;--ac:#3ec9a7}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--tx);font:13px system-ui,sans-serif}
+#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:block}
+#lab{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.l{position:absolute;left:0;top:0;white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,0 0 5px #000;display:none}
+.l.big{font-size:15px;letter-spacing:2px;font-weight:700}.l.sea{color:#9fd8ff;font-style:italic;letter-spacing:3px;font-size:13px}
+.ui{position:fixed;left:8px;right:8px;background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:7px 10px}
+#top{top:calc(8px + env(safe-area-inset-top,0px));font-weight:700}
+#top small{font-weight:400;opacity:.75;display:block}
+#infow{bottom:calc(58px + env(safe-area-inset-bottom,0px));line-height:1.35}#info{max-height:32vh;overflow:auto}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:10px}.tg{border:1px solid var(--bd);background:transparent;color:var(--tx);border-radius:12px;padding:3px 10px;font:inherit;font-weight:400}
+#chips{right:100px}#tm{position:fixed;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:9px 12px;background:var(--pn);z-index:2}
+#top.col{right:auto;width:auto}#top.col .ttl,#top.col small{display:none}
+#infow.col{left:auto;width:auto}#infow.col #info,#infow.col .hd b{display:none}
+#chips{bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;overflow-x:auto;padding:6px}
+.c{flex:none;border:1px solid var(--bd);background:transparent;color:var(--tx);border-radius:16px;padding:6px 11px;font:inherit}
+.c.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+#leg{top:calc(112px + env(safe-area-inset-top,0px));display:block;font-size:10px;line-height:1.5;padding:5px 8px}#leg div{display:inline-block;margin-right:9px;white-space:nowrap}body.tc #leg{top:calc(58px + env(safe-area-inset-top,0px))}#leg i{display:inline-block;width:12px;height:12px;border:1px solid #000;margin-right:6px;vertical-align:-2px}
+#info table{border-collapse:collapse;margin:6px 0}#info td{padding:2px 14px 2px 0;vertical-align:top}#info td:first-child{opacity:.7;white-space:nowrap}#info ul{margin:4px 0 0;padding-left:18px}
+@media(min-width:820px){#top{right:auto;width:290px}#infow{left:auto;right:8px;bottom:auto;top:calc(8px + env(safe-area-inset-top,0px));width:250px;font-size:12px}#info{max-height:calc(100vh - 150px)}#leg{right:auto;left:8px;top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:11px;line-height:1.55;padding:7px 10px}#leg div{display:block;margin:0}body.tc #leg{top:auto}#top.col,#infow.col{width:auto}}
+</style></head><body>
+<canvas id="cv"></canvas><div id="lab"></div>
+<div class="ui" id="top"><div class="hd"><span class="ttl">Pakistan 3D Topography Atlas</span><button class="tg" id="tb">Hide</button></div><small>Drag: rotate · Pinch/scroll: zoom · Two fingers/right-drag: pan · Tap a label for notes · Zoom in for more labels</small></div>
+<div class="ui" id="infow"><div class="hd"><b>Notes</b><button class="tg" id="ib">Hide</button></div><div id="info"><b>Pakistan Studies map.</b> Heights are exaggerated; boundaries and features are approximate (study aid, not a survey map).</div></div>
+<div class="ui" id="chips"></div><button class="c" id="tm"></button><div class="ui" id="leg"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const LON0=60,LON1=80,LAT0=22,LAT1=38.5,K=10,CL=.87,HS=1.45;
+const X=lo=>(lo-69)*K*CL,Z=la=>-(la-30)*K,sm=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x)};
+const ell=(lo,la,c)=>{const d=(((lo-c[0])/c[2])**2+((la-c[1])/c[3])**2)*(1+.2*Math.sin(lo*21+la*13)+.12*Math.sin(lo*47-la*31));return 1-sm(.8,1.08,d)};
+/* terrain blobs: lon,lat,sx,sy,height(km) */
+const B=[[76.5,35.8,1.2,.6,7.6],[75.6,36,.9,.6,6],[74.6,36.4,.8,.6,5.6],[77.5,35.8,1.2,.8,5.6],[78,36.6,2,1.5,5],[79.2,34.5,2,1.8,4.9],[79.5,36.8,2,1.5,5.4],[73.5,37.7,1.6,.7,5.2],[69,37.5,3,.8,2.8],[75.4,35,.5,.35,4.1],[74.6,35.2,.5,.4,7.8],[73.5,34.8,1,.5,4],[75.5,34.5,1.5,.6,4.5],[76.5,33.8,2,.8,4.6],[77.2,32,1.5,1.5,3.8],
+[71.8,36.3,.6,.4,7.2],[70.5,35.7,1.2,.6,4.6],[69,35,1.5,.8,3.6],[67,34.5,2,.8,3],[65,34.5,2,1,2.5],[63,33,3,2,1.3],[62,31.5,3,1.3,.9],
+[73.4,34,.6,.5,2.4],[74.2,34.2,.8,.5,3.6],[72.8,34.8,.8,.5,3.6],[72.2,35.2,.8,.8,4.6],
+[69.8,31.5,.5,1.7,3.3],[69.5,30,.6,1,2.6],[69.6,33.2,.5,.8,3],[68.5,32,1,1,2],[66.8,31,.9,.8,2.8],[66.8,29.8,.8,.8,2.3],
+[67.2,26.8,.5,1.5,1.9],[66.7,28,.6,1,2.3],[66.2,25.5,.7,.8,1.5],[63.5,26.5,1.5,.6,1.3],[64.8,26,1.2,.5,1.4],[62.3,26.5,.8,.6,1.4],[64.5,29.5,1.5,.8,1.2],[65,29,3,2,.9],[60.5,28,1.2,1.8,1.2],
+[72.5,32.7,.9,.2,.9],[73.2,33.4,1,.4,.6],[71.5,33.3,.5,.3,.5],[74.5,27.5,1,1,.6]];
+function hk(lo,la){let h=.08;for(const b of B){const d=((lo-b[0])/b[2])**2+((la-b[1])/b[3])**2;if(d<9){const v=b[4]*Math.exp(-d);if(v>h)h=v}}return h*(1+.07*Math.sin(lo*9.1+la*4.3)+.05*Math.sin(lo*17+la*13))}
+const CO=[[60,25.4],[62.3,25.1],[64.6,25.2],[66.7,24.8],[67.1,24.5],[67.45,23.9],[68,23.85],[68.2,23.7],[69,22.9],[70.2,22.6],[72,21.3],[80,18]];
+function coast(lo){for(let i=0;i<CO.length-1;i++){const a=CO[i],b=CO[i+1];if(lo<=b[0])return a[1]+(b[1]-a[1])*Math.max(0,(lo-a[0])/(b[0]-a[0]))}return 18}
+function HY(lo,la){const d=la-coast(lo);return d<0?-Math.min(.5,-d*.4):hk(lo,la)*sm(0,.3,d)}
+/* borders */
+const IRAN=[[61.6,25.1],[61.7,26.2],[62.7,26.4],[63.2,26.7],[63.2,27.2],[62.8,28.3],[61.9,28.6],[61.65,29.2],[60.87,29.86]];
+const AFG=[[60.87,29.86],[62.4,29.4],[64.1,29.4],[65.1,29.8],[66.3,30.9],[67.6,31.3],[68.9,31.7],[69.5,32.4],[69.9,33],[70.4,33.5],[71.1,34.05],[71.1,34.5],[71.4,35],[71.6,35.5],[71.5,36],[71.6,36.5],[72.6,36.85],[73.7,36.9],[74.9,37]];
+const CHINA=[[74.9,37],[75.4,36.85],[75.9,36.7],[76.2,36.3],[76.6,35.95],[77.3,35.6],[77.8,35.5]];
+const LOC=[[77.8,35.5],[77,35.3],[76.4,34.9],[75.7,34.5],[74.8,34.7],[74.1,34.5],[73.7,34],[73.7,33.4],[74,33],[74.4,32.8]];
+const INDIA=[[74.4,32.8],[74.6,32.3],[74.7,31.9],[74.55,31.6],[74.55,31],[73.9,30.4],[73,29.9],[72.2,29.2],[71.1,28.3],[70.3,28],[69.6,27.2],[70.2,26.5],[70.6,25.7],[70.1,25.2],[69.5,24.4],[68.8,23.9],[68.2,23.7]];
+const COAST=[[68.2,23.7],[68,23.85],[67.45,23.9],[67.1,24.5],[66.7,24.8],[64.6,25.2],[62.3,25.1],[61.6,25.1]];
+const PG=[...IRAN,...AFG.slice(1),...CHINA.slice(1),...LOC.slice(1),...INDIA.slice(1),...COAST.slice(1)];
+function inP(x,y){let c=false;for(let i=0,j=PG.length-1;i<PG.length;j=i++){const a=PG[i],b=PG[j];if((a[1]>y)!=(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+const DES=[[70.5,25.8,1.3,1.5],[71.6,28.5,1.5,.9],[71.3,31.8,.7,1],[65.4,28.3,1.5,.9],[63.5,29,1.6,.8],[69,26.8,.7,.9]];
+const FOR=[[73.3,34.1,.8,.6],[71.8,35.1,.9,.8],[73.6,34.8,.8,.4],[67.7,30.4,.5,.4],[67.75,24.35,.75,.5],[74,31.1,.2,.15],[74.5,34,.6,.4]];
+const GLA=[[77.1,35.4,.5,.4],[76.4,35.7,.55,.25],[75.5,35.95,.8,.28],[74.5,36.45,.45,.3],[74.8,36.15,.3,.25],[74.6,35.25,.3,.25],[72,36.3,.4,.3]];
+const pin=(P,x,y)=>{let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!=(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c};
+const PA=[...AFG,[74.9,37.3],[60,37.3],[60,29.86]],PI=[...IRAN,[60,29.86],[60,22],[61.6,22]],PC=[...CHINA,[80,35.5],[80,38.5],[74.9,38.5]];
+function cty(lo,la){if(pin(PI,lo,la))return 3;if(pin(PA,lo,la))return 2;if(pin(PC,lo,la)||(lo>77.8&&la>34))return 4;if(la>37.3&&lo<74.9)return 5;return 1}
+const TINT=[[0,0,0],[.55,.8,.35],[.88,.55,.3],[.82,.35,.35],[.55,.62,.9],[.72,.5,.82]];
+const PLN=[[73,31.3,2.3,1.5],[68.5,26.2,1.2,1.8],[75.5,30.8,1.8,.8],[71.7,33.9,.5,.35]];
+const PLI=[[72.8,33.3,1,.6,'Potohar Plateau',2,'Potohar (Pothwar) Plateau: 300–600 m, between the Indus and Jhelum; Rawalpindi and Islamabad; deeply cut by ravines; oil-bearing.'],[65.6,28.6,2.3,1.9,'Balochistan Plateau',1,'Balochistan Plateau: ~600–1,500 m, the arid eastern rim of the Iranian Plateau; Quetta, Kalat, Kharan.'],[75.4,35,.5,.35,'Deosai Plateau',3,'Deosai: ~4,114 m, one of the world\'s highest plateaus; "Land of Giants"; Himalayan brown bear national park.'],[79.3,34.3,1.8,1.7,'Tibetan Plateau (China)',2,'Tibetan Plateau: "roof of the world", ~4,500 m average; the Indus rises on its edge.'],[60.4,29.5,.7,1.5,'Iranian Plateau',2,'Iranian Plateau: Iran and Afghanistan; continues into Balochistan.'],[73.5,37.8,1.4,.6,'Pamir Plateau',3,'Pamir: the "Pamir Knot" where the Himalaya, Karakoram and Hindu Kush meet; Tajikistan and the Wakhan.']],PLT=PLI.map(p=>p.slice(0,4));
+/* renderer */
+const cv=document.getElementById('cv'),rd=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+rd.setPixelRatio(Math.min(3,devicePixelRatio));rd.setClearColor(0x0b1e2b);
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,1,2000);
+sc.fog=new THREE.Fog(0x0b1e2b,420,1000);sc.add(new THREE.HemisphereLight(0xffffff,0x445566,.55));const dl=new THREE.DirectionalLight(0xffffff,1);dl.position.set(-80,120,60);sc.add(dl);
+const NX=300,NZ=250,geo=new THREE.PlaneGeometry(1,1,NX,NZ),ps=geo.attributes.position,N=ps.count;
+const E=new Float32Array(N),wd=new Float32Array(N),wf=new Float32Array(N),wg=new Float32Array(N),ins=new Uint8Array(N),wp=new Float32Array(N),wl=new Float32Array(N),wh=new Float32Array(N),cn=new Uint8Array(N);
+for(let i=0;i<N;i++){const ix=i%(NX+1),iy=(i/(NX+1))|0,lo=LON0+ix/NX*(LON1-LON0),la=LAT1-iy/NZ*(LAT1-LAT0),e=HY(lo,la);E[i]=e;
+ps.setXYZ(i,X(lo),e*HS,Z(la));ins[i]=inP(lo,la)?1:0;cn[i]=ins[i]?0:cty(lo,la);
+if(e>0){wp[i]=Math.max(...PLN.map(c=>ell(lo,la,c)))*(1-sm(.6,1.2,e));wl[i]=Math.max(...PLT.map(c=>ell(lo,la,c)));wh[i]=Math.max(...[2,3,5].map(k=>ell(lo,la,PLT[k])));wd[i]=Math.max(...DES.map(c=>ell(lo,la,c)))*sm(3,1.5,e);wf[i]=Math.max(...FOR.map(c=>ell(lo,la,c)))*(1-sm(3,4.2,e));wg[i]=Math.max(Math.max(...GLA.map(c=>ell(lo,la,c))),la>34.3?.7*sm(5.2,6,e):0)}}
+geo.computeVertexNormals();geo.setAttribute('color',new THREE.BufferAttribute(new Float32Array(N*3),3));
+const RAMP=[[0,[.62,.72,.42]],[.3,[.72,.68,.42]],[1.2,[.62,.52,.36]],[3,[.5,.43,.36]],[4.8,[.6,.58,.56]],[6.5,[.93,.93,.95]]];
+function ramp(e){for(let i=0;i<RAMP.length-1;i++){const a=RAMP[i],b=RAMP[i+1];if(e<=b[0]){const t=Math.max(0,(e-a[0])/(b[0]-a[0]));return a[1].map((v,k)=>v+(b[1][k]-v)*t)}}return RAMP[5][1]}
+const mix=(a,b,t)=>a.map((v,k)=>v+(b[k]-v)*t);
+const on={relief:1,rivers:1,mountains:1,plateaus:1,forests:1,glaciers:1,deserts:1,borders:1,loc:1,cities:1};
+const BC=[[.2,.5,.72],[.96,.98,1],[.08,.38,.17],[.15,.62,.55],[.8,.68,.5],[.9,.55,.3],[.38,.36,.38],[.45,.3,.2],[.64,.47,.3],[.38,.78,.27],[.7,.68,.46],[.58,.76,.6],[.5,.62,.88],[.62,.62,.62],[.55,.8,.58],[.95,.58,.58],[.9,.78,.45]];
+const BN=['Sea','Glaciers & snow','Forest','Mangrove & wetland','Desert','Plateau','','Mountains & hills','','Irrigated plains','Dry plains','Land (colours off)'];
+document.getElementById('leg').innerHTML=BN.map((n,i)=>!n?'':'<div><i style="background:rgb('+BC[i].map(v=>v*255|0)+')"></i>'+n+'</div>').join('');
+const BID=new Uint8Array(N);let OL=null;
+function bid(i){const e=E[i];if(e<0)return 0;if(!ins[i])return 11+cn[i];const ix=i%(NX+1),iy=(i/(NX+1))|0,lo=LON0+ix/NX*(LON1-LON0),la=LAT1-iy/NZ*(LAT1-LAT0);
+if(wg[i]>.5||e>6.2)return 1;
+if(wf[i]>.5)return(la<24.8&&lo>66.9&&lo<68.5)?3:2;
+if(wd[i]>.5)return 4;
+if(wl[i]>.5&&(wh[i]>.5||e<3.1))return 5;
+return e>=1.3?7:wp[i]>.5?9:10}
+function outline(){if(OL){OG.remove(OL);OL.geometry.dispose()}const pts=[],W=NX+1;
+const P3=(a,b)=>[(ps.getX(a)+ps.getX(b))/2,(ps.getY(a)+ps.getY(b))/2+.3,(ps.getZ(a)+ps.getZ(b))/2];
+for(let y=0;y<NZ;y++)for(let x=0;x<NX;x++){const a=y*W+x,b=a+1,d=a+W,c=d+1,m=[];
+if(BID[a]!=BID[b]&&vis(BID[a],BID[b]))m.push(P3(a,b));if(BID[b]!=BID[c]&&vis(BID[b],BID[c]))m.push(P3(b,c));if(BID[d]!=BID[c]&&vis(BID[d],BID[c]))m.push(P3(d,c));if(BID[a]!=BID[d]&&vis(BID[a],BID[d]))m.push(P3(a,d));
+if(m.length==2)pts.push(...m[0],...m[1]);else if(m.length>2){const q=P3(a,c);for(const p of m)pts.push(...p,...q)}}
+OL=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(pts,3)),new THREE.LineBasicMaterial({color:0x2e2e2e,transparent:true,opacity:.8}));OG.add(OL)}
+function paint(){const c=geo.attributes.color;for(let i=0;i<N;i++){const b=bid(i);BID[i]=b;const e=E[i],ix=i%(NX+1),lo=LON0+ix/NX*(LON1-LON0),la=LAT1-((i/(NX+1))|0)/NZ*(LAT1-LAT0),nz=Math.sin(lo*31+la*17)*Math.sin(lo*13-la*29);
+let f=1+nz*.04;if(b==0)f=1+Math.max(-.5,e)*.4+nz*.02;else if(b==7)f=1.08-(Math.min(e,6)-1.3)*.05+nz*.05;else if(b==5)f=1+(Math.min(e,5)-2)*.025+nz*.04;else if(b==4)f=1+nz*.08;else if(b==2)f=1+nz*.07;else if(b>=12)f=1-Math.min(e,5)*.02+nz*.025;
+const col=BC[(on.relief||b==0||b>11)?b:11].map(v=>Math.min(1,v*f));c.setXYZ(i,col[0],col[1],col[2])}c.needsUpdate=true;outline()}
+function paintOld(){const c=geo.attributes.color;for(let i=0;i<N;i++){const e=E[i];let col;
+if(e<0)col=mix([.18,.58,.72],[.03,.17,.33],Math.min(1,-e*2.2));
+else{col=on.relief?mix(ramp(e),[.38,.62,.26],wp[i]*.9):(v=>[v,v,v])(Math.min(.85,.45+e*.06));
+if(on.plateaus)col=mix(col,[.72,.46,.3],wl[i]*.85);if(on.deserts)col=mix(col,[.96,.85,.5],wd[i]);if(on.forests)col=mix(col,[.14,.45,.22],wf[i]);if(on.glaciers)col=mix(col,[.82,.94,1],wg[i]);
+if(!ins[i])col=mix(col.map(v=>v*.86),TINT[cn[i]],.3)}
+{const nz=.95+.1*Math.abs(Math.sin(i*12.9898));c.setXYZ(i,col[0]*nz,col[1]*nz,col[2]*nz)}}c.needsUpdate=true}
+sc.add(new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1})));
+/* overlays */
+const G={};for(const k in on){G[k]=new THREE.Group();sc.add(G[k])}
+const V=THREE.Vector3,yAt=(lo,la)=>Math.max(0,HY(lo,la))*HS;
+function drape(p,off,step=.12){const o=[];for(let i=0;i<p.length-1;i++){const a=p[i],b=p[i+1],n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/step));for(let k=0;k<n;k++){const t=k/n,lo=a[0]+(b[0]-a[0])*t,la=a[1]+(b[1]-a[1])*t;o.push(new V(X(lo),yAt(lo,la)+off,Z(la)))}}const e=p[p.length-1];o.push(new V(X(e[0]),yAt(e[0],e[1])+off,Z(e[1])));return o}
+const BL=new THREE.Group(),OG=new THREE.Group();sc.add(BL);sc.add(OG);
+const TG={1:'glaciers',2:'forests',3:'forests',4:'deserts',5:'plateaus',7:'mountains',9:'forests'},vis=(a,b)=>{const x=TG[a],y=TG[b];return(x||y)?!!((x&&on[x])||(y&&on[y])):true};
+function edge(v,r,g){const m=new THREE.LineBasicMaterial({color:0x0a2f55});for(const s of[-1,1]){const a=v.map((p,i)=>{const q=v[Math.min(i+1,v.length-1)],o=v[Math.max(i-1,0)],tx=q.x-o.x,tz=q.z-o.z,l=Math.hypot(tx,tz)||1;return new V(p.x-tz/l*r*s,p.y+r*.3,p.z+tx/l*r*s)});g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(a),m))}}
+function tube(p,col,r,g,dash){const v=drape(p,r+.4),m=new THREE.MeshBasicMaterial({color:col});
+const add=a=>g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(a),a.length*2,r,5),m));
+if(dash){for(let i=0;i+3<v.length;i+=6)add(v.slice(i,i+4))}else add(v);if(col===0x2fa8ff)edge(v,r,g)}
+function dot(g,geom,col,lo,la,dy){const m=new THREE.Mesh(geom,new THREE.MeshLambertMaterial({color:col}));m.position.set(X(lo),yAt(lo,la)+dy,Z(la));g.add(m)}
+/* labels */
+const LB=[],lab=document.getElementById('lab');
+function L(cat,t,lo,la,tier,info,cls,dy){if(cat==='plates')return;const el=document.createElement('div');el.className='l '+(cls||'');el.textContent=t;lab.appendChild(el);
+LB.push({cat,t,tier,info,el,p:new V(X(lo),yAt(lo,la)+(dy||1.5),Z(la)),w:t.length*(cls=='big'?11:7)+8,h:cls=='big'?20:15,sx:0,sy:0,s:0})}
+/* rivers */
+const RV=[['Indus',[[75.6,35.3],[74.9,35.5],[74.4,35.4],[74,35.2],[73,35],[72.7,34.3],[72.25,33.9],[71.8,33.2],[71.6,32.5],[70.9,31.8],[70.8,30.7],[70.4,29],[69.7,28.4],[68.9,27.7],[68.4,25.4],[68,24.8],[67.7,24.5]],.55,'Indus (~3,180 km): Pakistan\'s lifeline. Rises in Tibet, flows through Gilgit-Baltistan, KP, Punjab and Sindh and ends in the Arabian Sea in a delta near Thatta. Tarbela, Sukkur and Kotri barrages/dams are on it.'],
+['Kabul R.',[[69.2,34.5],[70,34.4],[71.1,34.2],[71.6,34],[72.25,33.9]],.3,'Kabul River: from Afghanistan via Khyber Pakhtunkhwa (Peshawar valley); joins the Indus at Attock.'],
+['Gilgit R.',[[73.5,36.5],[74.3,35.9],[74.6,35.46]],.28,'Gilgit River: joins the Indus near Jaglot, Gilgit-Baltistan.'],
+['Hunza R.',[[74.9,36.8],[74.7,36.3],[74.5,35.9],[74.45,35.75]],.25,'Hunza River: drains Karakoram glaciers; joins the Gilgit River.'],
+['Swat R.',[[72.4,35.4],[72,34.8],[71.75,34.3],[71.6,34]],.22,'Swat River: flows through Swat valley and joins the Kabul River.'],
+['Jhelum',[[74.8,34.1],[74.2,34.2],[73.7,34],[73.5,34.4],[73.7,33.6],[73.6,33.15],[73.4,32.5],[72.5,32.1],[72.1,31.15]],.3,'Jhelum: rises in Kashmir, Mangla Dam on it; joins the Chenab at Trimmu. (Western river under the Indus Waters Treaty 1960.)'],
+['Chenab',[[74.5,32.9],[74.5,32.6],[73.5,32],[72.9,31.7],[72.4,31.3],[72.1,31.15],[71.8,30.7],[71.5,30.1],[71,29.35]],.3,'Chenab: enters Pakistan at Marala; joins the Jhelum, Ravi and Sutlej to form the Panjnad. (Western river.)'],
+['Ravi',[[74.8,32.5],[74.5,31.9],[74.2,31.6],[73.5,31],[72.4,30.6],[71.8,30.7]],.22,'Ravi: flows past Lahore; an Eastern river allocated to India under the Indus Waters Treaty 1960.'],
+['Sutlej',[[74.6,31.1],[73.9,30.4],[73.2,29.9],[72.5,29.5],[71.5,29.2],[71,29.35]],.25,'Sutlej: Eastern river; flows through Bahawalpur; joins the Chenab to form the Panjnad.'],
+['Panjnad',[[71,29.35],[70.4,29]],.35,'Panjnad: confluence of the five Punjab rivers; flows into the Indus at Mithankot.'],
+['Gomal R.',[[69,32.4],[70.3,32],[70.9,31.8]],.2,'Gomal River: from Afghanistan/South Waziristan; joins the Indus near Dera Ismail Khan.']];
+for(const r of RV){tube(r[1],0x2fa8ff,r[2],G.rivers);const m=r[1][r[1].length>>1];L('rivers',r[0],m[0],m[1],r[2]>.5?2:3,r[3],'',1.2)}
+[['Hajamro Creek',[[67.7,24.5],[67.5,24.2],[67.45,23.95]]],['Khobar Creek',[[67.7,24.5],[67.8,24.2],[67.95,23.9]]],['Mutni Creek',[[67.7,24.5],[67.62,24.15],[67.7,23.9]]],['Kajhar Creek',[[67.7,24.5],[67.95,24.35],[68.1,23.9]]]].forEach(c=>{tube(c[1],0x2fa8ff,.16,G.rivers);L('rivers',c[0],c[1][2][0],c[1][2][1],4,'Indus delta distributary: below Thatta the Indus splits into many creeks and tidal channels before reaching the Arabian Sea.','',1)});
+L('rivers','INDUS DELTA',67.75,24.2,2,'Indus Delta (Sindh, near Thatta/Keti Bandar): a fan-shaped delta and Ramsar wetland with large mangrove forests; shrinking because less water and silt now reach the sea, letting seawater creep inland.','big',1.5);
+/* borders */
+tube(AFG,0x050505,.6,BL);tube(IRAN,0x050505,.6,BL);tube(CHINA,0x050505,.6,BL);tube(INDIA,0x050505,.6,BL);tube(COAST,0x050505,.5,BL);tube(LOC,0x050505,.6,BL);
+const BT=[['Durand Line (Afghanistan)','2,640 km',AFG],['Pakistan–Iran border','959 km',IRAN,.72,34],['Pakistan–China border','523 km',CHINA],['Pakistan–India border','3,323 km incl. LOC',INDIA,.34,46,0],['Arabian Sea coastline','1,046 km',COAST]];
+[].forEach(b=>{const P=b[2],s=[];let L=0;for(let i=0;i<P.length-1;i++){const d=Math.hypot((P[i+1][0]-P[i][0])*CL,P[i+1][1]-P[i][1]);s.push(d);L+=d}let t=L/2,i=0;while(i<s.length-1&&t>s[i]){t-=s[i];i++}const f=t/s[i],lo=P[i][0]+(P[i+1][0]-P[i][0])*f,la=P[i][1]+(P[i+1][1]-P[i][1])*f;
+let tx=(P[i+1][0]-P[i][0])*K*CL,tz=-(P[i+1][1]-P[i][1])*K;const l=Math.hypot(tx,tz);tx/=l;tz/=l;let nx=-tz,nz=tx;if(inP((X(lo)+nx*7)/(K*CL)+69,30-(Z(la)+nz*7)/K)){nx=-nx;nz=-nz}
+const px=X(lo)+nx*7,pz=Z(la)+nz*7,plo=px/(K*CL)+69,pla=30-pz/K,y=Math.max(yAt(plo,pla),yAt(lo,la))+1;
+const cvs=document.createElement('canvas');cvs.width=1024;cvs.height=256;const c=cvs.getContext('2d');c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';
+const row=(txt,py,f0)=>{let fs=f0;c.font='bold '+fs+'px sans-serif';while(c.measureText(txt).width>980&&fs>20){fs-=4;c.font='bold '+fs+'px sans-serif'}c.lineWidth=fs/5;c.strokeStyle='#fff';c.strokeText(txt,512,py);c.fillStyle='#1b1b1b';c.fillText(txt,512,py)};
+row(b[0],85,70);row(b[1],180,96);
+const tex=new THREE.CanvasTexture(cvs);tex.anisotropy=rd.capabilities.getMaxAnisotropy();
+const m=new THREE.Mesh(new THREE.PlaneGeometry(46,11.5),new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide}));
+let th=Math.atan2(-tz,tx);if(Math.abs(th)>Math.PI/2)th+=Math.PI;m.rotation.order='YXZ';m.rotation.set(-Math.PI/2,th,0);m.position.set(px,y,pz);G.borders.add(m)});
+tube(LOC,0xff2d2d,.8,G.loc,true);
+/* mountains */
+const cone=new THREE.ConeGeometry(.9,2.4,6);
+[['K2 8,611 m',76.51,35.88,1,'K2 (Godwin-Austen): 2nd highest peak on Earth, Karakoram, on the Pakistan–China border.'],['Nanga Parbat 8,126 m',74.59,35.24,3,'Nanga Parbat: 9th highest, western anchor of the Himalaya, Gilgit-Baltistan; "Killer Mountain".'],['Gasherbrum I 8,080 m',76.7,35.73,3,'Gasherbrum I (Hidden Peak): 11th highest, Karakoram.'],['Broad Peak 8,051 m',76.57,35.81,3,'Broad Peak: 12th highest, Karakoram. Pakistan has five of the world\'s 8,000 m peaks (K2, G-I, G-II, Broad Peak, Nanga Parbat).'],['Rakaposhi 7,788 m',74.49,36.14,3,'Rakaposhi: Karakoram, above Hunza/Nagar.'],['Tirich Mir 7,708 m',71.84,36.25,3,'Tirich Mir: highest peak of the Hindu Kush, Chitral.'],['Takht-e-Suleiman 3,487 m',69.97,31.62,3,'Highest peak of the Suleiman Range.'],['Sakesar 1,522 m',71.93,32.54,4,'Sakesar: highest peak of the Salt Range.']].forEach(p=>{dot(G.mountains,cone,0xeeeeee,p[1],p[2],1.2);L('mountains',p[0],p[1],p[2],p[3],p[4],'',3.5)});
+const bx=new THREE.BoxGeometry(1,1,1);
+[['Khyber Pass',71.1,34.1,'Khyber Pass: Peshawar–Kabul route, ~1,070 m; Torkham crossing.'],['Bolan Pass',67.4,29.5,'Bolan Pass: links Sibi/Quetta with the Indus plain; historic route.'],['Khunjerab Pass',75.4,36.85,'Khunjerab Pass 4,693 m: highest paved border crossing; Karakoram Highway, Pakistan–China.']].forEach(p=>{dot(G.mountains,bx,0xff9a3a,p[1],p[2],.6);L('mountains',p[0],p[1],p[2],3,p[3],'',2.2)});
+[['Karakoram Range',76,36.1,1,'Karakoram: ~65% of non-polar glaciers; K2, Gasherbrum, Broad Peak; home to Siachen, Baltoro, Biafo.'],['Himalaya',74.2,34.4,1,'Western Himalaya: Pir Panjal, Nanga Parbat massif; formed by the Indian–Eurasian collision.'],['Hindu Kush',71,35.9,1,'Hindu Kush: runs from Afghanistan into Chitral; Tirich Mir is its highest peak.'],['Suleiman Range',69.7,31.1,2,'Suleiman Range: eastern edge of the Iranian plateau; Takht-e-Suleiman.'],['Kirthar Range',67.3,26.9,2,'Kirthar Range: Sindh–Balochistan boundary.'],['Makran Coastal Range',64.5,25.9,2,'Makran: arid coastal ranges of Balochistan.'],['Salt Range',72.5,32.7,3,'Salt Range: Khewra salt mine; separates Potohar from the Punjab plain.'],['Toba Kakar',66.8,31.1,3,'Toba Kakar: ranges around Quetta/Zhob.']].forEach(p=>L('mountains',p[0],p[1],p[2],p[3],p[4],'big',4));
+G.plates=new THREE.Group();
+const PL=[[[61.5,24.6],[63,24.4],[64.5,24.6],[66,24.3]],0xff5a36],PT=[[[66,24.3],[66.3,23.2]],[[66.5,25],[66.3,26],[66.2,27.5],[65.9,29],[66.4,30.2],[66.9,31],[67.5,32.4],[68.4,33.7],[68.8,34.5],[70,35.2],[71.5,35.6]]],MM=[[71.5,35.6],[72.8,35.4],[73.7,35.1],[74.5,35],[75.5,34.9],[76.5,34.6],[77.5,34.3]];
+tube(PL[0],0xff5a36,.4,G.plates);PT.forEach(l=>tube(l,0xffd23a,.4,G.plates));tube(MM,0xff5a36,.4,G.plates);
+[['INDIAN PLATE',71,27.8,1,'Indian Plate: Pakistan\'s east and south. Moves north ~4–5 cm/yr, colliding with Eurasia ~50 million years ago to raise the Himalaya, Karakoram and Hindu Kush.','big'],['EURASIAN PLATE',64.5,33.5,1,'Eurasian Plate: north-western Pakistan, Afghanistan. Balochistan\'s Chaman area is its transform contact with the Indian Plate.','big'],['ARABIAN PLATE',62.5,23.2,1,'Arabian Plate: subducts beneath the Eurasian Plate at the Makran Subduction Zone.','big'],['Makran Subduction Zone',63.5,24.5,2,'Convergent boundary off Balochistan; caused the 1945 Makran earthquake and tsunami.',''],['Chaman Fault',66.4,30.2,3,'Chaman Fault: left-lateral transform boundary between the Indian and Eurasian plates.',''],['Owen Fracture Zone',66.3,23.4,3,'Transform boundary between the Arabian and Indian plates.',''],['Main Mantle Thrust',73.7,35.1,3,'Main Mantle Thrust: Himalayan suture zone; the 2005 Kashmir earthquake struck nearby.','']].forEach(p=>L('plates',p[0],p[1],p[2],p[3],p[4],p[5],2));
+
+PLI.forEach(p=>L('plateaus',p[4],p[0],p[1],p[5],p[6],p[5]==1?'big':'',3));
+BT.forEach(b=>{const P=b[2].map(p=>[X(p[0]),Z(p[1])]),cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const TL=cum[cum.length-1];
+const at=s=>{s=Math.min(TL,Math.max(0,s));let i=1;while(i<P.length-1&&cum[i]<s)i++;const f=(s-cum[i-1])/(cum[i]-cum[i-1]||1);return[P[i-1][0]+(P[i][0]-P[i-1][0])*f,P[i-1][1]+(P[i][1]-P[i-1][1])*f]};
+const tg=s=>{const a=at(s-16),e=at(s+16),dx=e[0]-a[0],dz=e[1]-a[1],l=Math.hypot(dx,dz)||1;return[dx/l,dz/l]};
+const s0=TL*(b[3]||.5),LT=b[4]||46,H=LT/4,m0=tg(s0),sg=m0[0]<0?-1:1,w2g=(x,z)=>[x/(K*CL)+69,30-z/K],bad=q=>{const g=w2g(q[0],q[1]);return inP(g[0],g[1])};
+const build=(d,sd)=>{const Q=[];for(let k=0;k<=32;k++){const q0=(k/32-.5)*LT,p=[pm[0]+q0*tc[0],pm[1]+q0*tc[1]],ux=tc[1],uz=-tc[0],cx=p[0]+sd*ux*d,cz=p[1]+sd*uz*d;Q.push([cx-ux*H/2,cz-uz*H/2],[cx+ux*H/2,cz+uz*H/2])}return Q};
+const pm=at(s0),tc=(()=>{const a=at(s0-LT/2),e=at(s0+LT/2),dx=e[0]-a[0],dz=e[1]-a[1],l=Math.hypot(dx,dz)||1;return dx<0?[-dx/l,-dz/l]:[dx/l,dz/l]})();let d=H/2+2+(b[5]||0),sd=1;const p0=pm;if(bad([p0[0]+tc[1]*d,p0[1]-tc[0]*d]))sd=-1;
+let Q=build(d,sd);for(let n=0;n<30&&Q.some(bad);n++){d+=2;Q=build(d,sd)}
+const cv2=document.createElement('canvas');cv2.width=1024;cv2.height=256;const x2=cv2.getContext('2d');x2.textAlign='center';x2.textBaseline='middle';x2.lineJoin='round';
+const row=(txt,py,f0)=>{let fs=f0;x2.font='bold '+fs+'px sans-serif';while(x2.measureText(txt).width>980&&fs>20){fs-=4;x2.font='bold '+fs+'px sans-serif'}x2.lineWidth=fs/5;x2.strokeStyle='#fff';x2.strokeText(txt,512,py);x2.fillStyle='#1b1b1b';x2.fillText(txt,512,py)};
+row(b[0],85,70);row(b[1],180,96);
+const tex=new THREE.CanvasTexture(cv2);tex.anisotropy=rd.capabilities.getMaxAnisotropy();
+const YM=Math.max(...Q.map(q=>{const g=w2g(q[0],q[1]);return yAt(g[0],g[1])}))+1.5;const gm=new THREE.BufferGeometry(),pos=[],uv=[],idx=[];
+for(let k=0;k<=32;k++){const a=Q[2*k],c2=Q[2*k+1],ga=w2g(a[0],a[1]),gc=w2g(c2[0],c2[1]),y=YM;pos.push(a[0],y,a[1],c2[0],y,c2[1]);uv.push(k/32,0,k/32,1);if(k<32){const i=2*k;idx.push(i,i+1,i+2,i+1,i+3,i+2)}}
+gm.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));gm.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));gm.setIndex(idx);
+const mesh=new THREE.Mesh(gm,new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide}));mesh.renderOrder=2;G.borders.add(mesh)});
+/* forests, glaciers, deserts */
+[['Himalayan Moist Temperate Forests',73.3,34.1,2,'Galiyat/Murree/Neelum: pine, fir, deciduous forests.'],['Swat–Dir–Chitral Coniferous Forests',71.8,35.1,2,'Deodar, blue pine and spruce forests of northern KP.'],['Ziarat Juniper Forest',67.7,30.4,3,'One of the world\'s largest juniper forests, Balochistan.'],['Indus Delta Mangroves',67.8,24.4,3,'Mangroves (Avicennia marina), Sindh coast; among the largest arid-climate mangrove forests.'],['Changa Manga (planted)',74,31.1,4,'Man-made irrigated forest near Lahore.']].forEach(p=>L('forests',p[0],p[1],p[2],p[3],p[4],'',1.5));
+[['Siachen Glacier',77.1,35.4,2,'Siachen: ~76 km, longest glacier in the Karakoram; world\'s highest battlefield.'],['Baltoro Glacier',76.4,35.7,2,'Baltoro: ~63 km; route to K2 base camp.'],['Biafo–Hispar',75.5,35.95,2,'Biafo & Hispar glaciers form the longest glacial system outside the polar regions.'],['Batura Glacier',74.5,36.45,3,'Batura: ~57 km, Hunza.'],['Rakaposhi–Nanga glaciers',74.7,35.7,4,'Pakistan holds ~7,000+ glaciers, more than anywhere outside the polar regions.']].forEach(p=>L('glaciers',p[0],p[1],p[2],p[3],p[4],'',3));
+[['Thar Desert',70.5,25.8,1,'Thar (Tharparkar): Sindh, subtropical desert shared with India.'],['Cholistan Desert',71.6,28.5,2,'Cholistan: south Punjab, near Bahawalpur; Derawar Fort.'],['Thal Desert',71.3,31.8,2,'Thal: Punjab between the Indus and Jhelum.'],['Kharan Desert',65.4,28.3,2,'Kharan: Balochistan; sandy desert, nuclear test site area (Chagai nearby).'],['Chagai–Registan Desert',63.5,29,3,'Chagai: arid western Balochistan; Registan continues into Afghanistan.'],['Nara Desert',69,26.8,4,'Nara: Sindh, near Sukkur.']].forEach(p=>L('deserts',p[0],p[1],p[2],p[3],p[4],'',1.5));
+/* neighbors, LOC, cities */
+[['PAKISTAN',68.6,29.6,1,'Pakistan: 4 provinces, Gilgit-Baltistan, AJK, ICT. Borders: Afghanistan, Iran, China, India; coast on the Arabian Sea (~1,046 km).','big'],['AFGHANISTAN',65.4,36.2,1,'Afghanistan: ~2,640 km Durand Line (1893), the longest Pakistani border. Wakhan Corridor separates Pakistan from Tajikistan.','big'],['INDIA',78,26.8,1,'India: ~3,323 km border (Radcliffe Line 1947, plus LOC in Kashmir and Sir Creek in the south).','big'],['CHINA',79,37.9,1,'China: ~523 km border. Khunjerab Pass; 1963 boundary agreement; CPEC route.','big'],['IRAN',60.5,25.7,1,'Iran: ~959 km border (Goldsmid line 1871; boundary agreement 1958). Taftan crossing.','big'],['ARABIAN SEA',64.5,22.5,1,'Arabian Sea: Pakistan\'s ~1,046 km coast, Gwadar, Karachi, Ormara. Sir Creek marsh at the India border.','sea'],['Wakhan Corridor',73.8,37.2,3,'Afghan strip separating Pakistan from Tajikistan.','']].forEach(p=>L('borders',p[0],p[1],p[2],p[3],p[4],p[5],2));
+[['Durand Line',69.8,32.5,2,'Durand Line (1893): Pakistan–Afghanistan border, ~2,640 km.'],['Radcliffe Line / Wagah',74.6,31.6,2,'Radcliffe Line (1947) partitioned Punjab; Wagah–Attari crossing near Lahore.'],['Sir Creek',68.4,23.8,3,'Sir Creek: disputed marshy creek in Rann of Kutch.'],['Taftan',62.4,28.6,3,'Pakistan–Iran border crossing.'],['Khunjerab (China border)',75.9,36.7,3,'Pakistan–China border along the Karakoram; Khunjerab Pass 4,693 m.']].forEach(p=>L('borders',p[0],p[1],p[2],p[3],p[4],'',2));
+[['Line of Control (LOC)',75.3,34.65,1,'LOC: ~740 km de facto line in Kashmir, set by the 1972 Simla Agreement (from the 1949 Ceasefire Line). Pakistan administers AJK and Gilgit-Baltistan.','big'],['Siachen (NJ9842)',77.2,35.2,2,'Where the LOC ends at NJ9842; north of it the Actual Ground Position Line runs through Siachen.','']].forEach(p=>L('loc',p[0],p[1],p[2],p[3],p[4],p[5],3));
+const sp=new THREE.SphereGeometry(.55,10,8);
+[['Islamabad',73.05,33.7,1,'Islamabad: federal capital (ICT), at Margalla Hills.'],['Karachi',67,24.86,1,'Karachi: largest city, port, capital of Sindh.'],['Lahore',74.35,31.55,1,'Lahore: capital of Punjab; Ravi River.'],['Quetta',67,30.2,2,'Quetta: capital of Balochistan; in the Suleiman/Toba Kakar belt.'],['Peshawar',71.58,34,2,'Peshawar: capital of Khyber Pakhtunkhwa; near Khyber Pass.'],['Gilgit',74.3,35.9,2,'Gilgit: capital of Gilgit-Baltistan.'],['Muzaffarabad',73.47,34.37,3,'Muzaffarabad: capital of Azad Jammu & Kashmir.'],['Hyderabad',68.37,25.4,3,'Hyderabad, Sindh.'],['Multan',71.47,30.2,3,'Multan: "city of saints", south Punjab.'],['Faisalabad',73.07,31.4,3,'Faisalabad: textile hub.'],['Gwadar',62.3,25.1,3,'Gwadar: deep-sea port, CPEC.'],['Skardu',75.57,35.3,3,'Skardu: gateway to K2 and Baltoro.'],['Sukkur',68.86,27.7,3,'Sukkur Barrage on the Indus.'],['Chitral',71.78,35.85,3,'Chitral: below Tirich Mir.'],['Kabul',69.2,34.5,2,'Kabul: capital of Afghanistan.'],['New Delhi',77.2,28.6,2,'New Delhi: capital of India.']].forEach(p=>{dot(G.cities,sp,0xffffff,p[1],p[2],.5);L('cities',p[0],p[1],p[2],p[3],p[4],'',1.6)});
+[['Punjab',72.8,31.2,2,'Punjab: most populous province; capital Lahore; "land of five rivers".','big'],['Sindh',68.8,26.3,2,'Sindh: capital Karachi; Indus delta and Thar.','big'],['Balochistan',65.5,28,2,'Balochistan: largest province by area (~44%); capital Quetta.','big'],['Khyber Pakhtunkhwa',72.2,34.5,2,'KP: capital Peshawar.','big'],['Gilgit-Baltistan',75.3,35.9,2,'Gilgit-Baltistan: Karakoram region; capital Gilgit.','big'],['Azad Kashmir',73.9,33.9,3,'Azad Jammu & Kashmir: capital Muzaffarabad.','big']].forEach(p=>L('cities',p[0],p[1],p[2],p[3],p[4],p[5],2));
+[['Kandahar',65.7,31.6,'Kandahar: southern Afghanistan.'],['Jalalabad',70.45,34.43,'Jalalabad: Afghanistan, on the Kabul River along the Torkham/Khyber route.'],['Zahedan',60.86,29.5,'Zahedan: Iran, near the Pakistan border (Taftan route).'],['Amritsar',74.87,31.63,'Amritsar: India, ~30 km from Lahore (Attari–Wagah crossing).'],['Srinagar',74.8,34.08,'Srinagar: Kashmir valley on the Jhelum (Indian-administered).'],['Leh',77.58,34.15,'Leh: Ladakh, on the upper Indus.']].forEach(p=>{dot(G.cities,sp,0xdddddd,p[1],p[2],.5);L('cities',p[0],p[1],p[2],3,p[3],'',1.6)});
+if(0)L('rivers','Helmand R. (Afghanistan)',64.5,31.5,3,'Helmand: Afghanistan\'s longest river; ends in the Hamun lakes on the Iran border.','',1.2);
+tube([[60.87,29.86],[60.5,31],[60.6,33],[60.7,35]],0xbbbbbb,.2,BL);tube([[74.9,37],[73.7,37.2],[72,37.1],[70,37.5],[67,37.3],[64,37.2],[61.5,36.6]],0xbbbbbb,.2,BL);
+[['Pir Panjal',74.8,33.7,3,'Pir Panjal Range: outer Himalaya along the LOC; Kashmir valley lies beyond.'],['Ladakh Range',77.2,34.6,3,'Ladakh Range: north of the upper Indus, Indian-administered Ladakh.'],['Aravalli Range',74.5,27.5,4,'Aravalli: ancient range in Rajasthan, India.']].forEach(p=>L('mountains',p[0],p[1],p[2],p[3],p[4],'',3));
+/* UI */
+const NAMES={relief:'Relief colours',rivers:'Rivers',mountains:'Mountains',plateaus:'Plateaus',forests:'Forests',glaciers:'Glaciers',deserts:'Deserts',borders:'Neighbours',loc:'LOC',cities:'Cities'};
+const ch=document.getElementById('chips'),inf=document.getElementById('info');
+function sync(){for(const b of ch.querySelectorAll('.c'))if(b.dataset.k)b.classList.toggle('on',!!on[b.dataset.k]);for(const k in G)G[k].visible=!!on[k];paint()}
+function btn(t,k,fn){const b=document.createElement('button');b.className='c';b.textContent=t;if(k)b.dataset.k=k;b.onclick=fn;ch.appendChild(b)}
+btn('Show all',0,()=>{for(const k in on)on[k]=1;sync()});btn('Hide all',0,()=>{for(const k in on)on[k]=0;sync()});btn('Legend',0,()=>{const l=document.getElementById('leg');l.style.display=getComputedStyle(l).display=='none'?'block':'none'});btn('Reset view',0,()=>{A=0;El=.95;R=R0;T.set(7,0,-2)});
+for(const k in NAMES)btn(NAMES[k],k,()=>{on[k]=on[k]?0:1;sync()});
+const FACTS={'PAKISTAN':[['Area','796,096 km²'],['Population','≈ 241.5 million (2023 census)'],['Capital','Islamabad'],['Independence','14 August 1947'],['Coastline','≈ 1,046 km'],['Highest point','K2, 8,611 m']],
+'AFGHANISTAN':[['Capital','Kabul'],['Type','Landlocked'],['Border with Pakistan','2,640 km (Durand Line, 1893)']],
+'INDIA':[['Capital','New Delhi'],['Border with Pakistan','3,323 km incl. LOC'],['Key lines','Radcliffe Line (1947), LOC (1972)']],
+'CHINA':[['Capital','Beijing'],['Border with Pakistan','523 km'],['Crossing','Khunjerab Pass, 4,693 m'],['Agreement','Boundary agreement, 1963']],
+'IRAN':[['Capital','Tehran'],['Border with Pakistan','959 km'],['Crossing','Taftan']],
+'Punjab':[['Capital','Lahore'],['Area','205,344 km²'],['Rank','Most populous province']],
+'Sindh':[['Capital','Karachi'],['Area','140,914 km²'],['Main river','Indus']],
+'Balochistan':[['Capital','Quetta'],['Area','347,190 km²'],['Rank','Largest by area (~44%)']],
+'Khyber Pakhtunkhwa':[['Capital','Peshawar'],['Area','101,741 km²']],
+'Gilgit-Baltistan':[['Capital','Gilgit'],['Area','72,496 km²'],['Ranges','Karakoram, Himalaya, Hindu Kush']],
+'Azad Kashmir':[['Capital','Muzaffarabad'],['Area','13,297 km²']],
+'K2 8,611 m':[['Elevation','8,611 m'],['World rank','2nd highest'],['Range','Karakoram'],['First ascent','1954']],
+'Nanga Parbat 8,126 m':[['Elevation','8,126 m'],['World rank','9th highest'],['Range','Himalaya'],['First ascent','1953']],
+'Gasherbrum I 8,080 m':[['Elevation','8,080 m'],['World rank','11th highest'],['Range','Karakoram']],
+'Broad Peak 8,051 m':[['Elevation','8,051 m'],['World rank','12th highest'],['Range','Karakoram']],
+'Rakaposhi 7,788 m':[['Elevation','7,788 m'],['Range','Karakoram'],['Area','Hunza/Nagar']],
+'Tirich Mir 7,708 m':[['Elevation','7,708 m'],['Range','Hindu Kush'],['Area','Chitral']],
+'Indus':[['Length','≈ 3,180 km'],['Source','Tibet, near Mt Kailash'],['Mouth','Arabian Sea (Indus Delta)']],
+'Jhelum':[['Length','≈ 725 km'],['Joins','Chenab, near Trimmu']],
+'Chenab':[['Length','≈ 960 km'],['Joins','Sutlej at Panjnad']],
+'Ravi':[['Length','≈ 720 km'],['Joins','Chenab'],['Treaty status','Eastern river (India)']],
+'Sutlej':[['Length','≈ 1,450 km'],['Joins','Chenab at Panjnad'],['Treaty status','Eastern river (India)']],
+'Kabul R.':[['Length','≈ 700 km'],['Joins','Indus at Attock']],
+'Balochistan Plateau':[['Elevation','≈ 600–1,500 m'],['Cities','Quetta, Kalat, Kharan']],
+'Potohar Plateau':[['Elevation','300–600 m'],['Cities','Rawalpindi, Islamabad']],
+'Deosai Plateau':[['Elevation','≈ 4,114 m'],['Region','Gilgit-Baltistan']],
+'Islamabad':[['Status','Federal capital'],['Territory','Islamabad Capital Territory']],
+'Karachi':[['Province','Sindh'],['Role','Largest city and main port']],
+'Lahore':[['Province','Punjab'],['River','Ravi']]};
+function tgl(w,b,on,off){const e=document.getElementById(w),x=document.getElementById(b);x.onclick=()=>{e.classList.toggle('col');x.textContent=e.classList.contains('col')?off:on;document.body.classList.toggle('tc',document.getElementById('top').classList.contains('col'))}}tgl('top','tb','Hide','Help');tgl('infow','ib','Hide','Notes');
+function show(l){const w=document.getElementById('infow');w.classList.remove('col');document.getElementById('ib').textContent='Hide';const f=FACTS[l.t],n=l.info.replace(/([.;])\s+/g,'$1\n').split('\n').filter(Boolean);inf.innerHTML='<b>'+l.t+'</b>'+(f?'<table>'+f.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>':'')+'<ul>'+n.map(s=>'<li>'+s+'</li>').join('')+'</ul>'}
+const tm=document.getElementById('tm'),rt=document.documentElement,isD=()=>rt.dataset.theme?rt.dataset.theme=='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);tm.textContent=isD()?'\u2600 Light':'\u263e Dark'}
+tm.onclick=()=>{rt.dataset.theme=isD()?'light':'dark';theme()};matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);theme();
+/* camera */
+let A=0,El=.95,R=230,T=new V(7,0,-2),TH=[0,1e9,170,100,60];
+function size(){rd.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
+addEventListener('resize',size);size();R=Math.min(480,Math.max(230,210/cam.aspect));const R0=R;
+const P=new Map();let ld=0,lm=[0,0],moved=0;
+const ang=()=>{const a=[...P.values()];return Math.atan2(a[1][1]-a[0][1],a[1][0]-a[0][0])};let lang=0;
+const mid=()=>{const a=[...P.values()];return[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2,Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])]};
+function pan(dx,dy){const s=R*.0016;T.x-=Math.cos(A)*dx*s-Math.sin(A)*dy*s*-1;T.z+=-Math.sin(A)*dx*s*-1-Math.cos(A)*dy*s}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY,e.button]);moved=0;if(P.size==2){const m=mid();lm=[m[0],m[1]];ld=m[2];lang=ang()}});
+cv.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);p[0]=e.clientX;p[1]=e.clientY;
+if(P.size==1){if(p[2]==2||e.shiftKey)pan(dx,dy);else{A-=dx*.006;El=Math.min(1.5,Math.max(.15,El+dy*.006))}}
+else if(P.size==2){const m=mid();R=Math.min(560,Math.max(28,R*ld/Math.max(1,m[2])));pan(m[0]-lm[0],m[1]-lm[1]);lm=[m[0],m[1]];ld=m[2]}});
+const up=e=>{if(P.size==1&&moved<8){let b=null,bd=1600;for(const l of LB)if(l.s&&l.info){const d=(l.sx-e.clientX)**2+(l.sy-e.clientY)**2;if(d<bd){bd=d;b=l}}if(b)show(b)}P.delete(e.pointerId)};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>P.delete(e.pointerId));
+cv.addEventListener('wheel',e=>{e.preventDefault();R=Math.min(560,Math.max(28,R*Math.exp(e.deltaY*.001)))},{passive:false});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+const v=new V();
+function frame(){cam.position.set(T.x+R*Math.cos(El)*Math.sin(A),T.y+R*Math.sin(El),T.z+R*Math.cos(El)*Math.cos(A));cam.lookAt(T);rd.render(sc,cam);
+const W=innerWidth,H=innerHeight,used=[];
+for(const l of LB){let s=on[l.cat]&&R<TH[l.tier];
+if(s){v.copy(l.p).project(cam);if(v.z>1||Math.abs(v.x)>1.05||Math.abs(v.y)>1.05)s=false;else{const x=(v.x+1)/2*W,y=(1-v.y)/2*H,a=x-l.w/2,b=y-l.h/2;
+for(const u of used)if(a<u[2]&&a+l.w>u[0]&&b<u[3]&&b+l.h>u[1]){s=false;break}
+if(s){used.push([a,b,a+l.w,b+l.h]);l.sx=x;l.sy=y;l.el.style.transform='translate('+(x-l.w/2)+'px,'+(y-l.h/2)+'px)'}}}
+l.s=s;l.el.style.display=s?'block':'none'}
+requestAnimationFrame(frame)}
+sync();frame();
+</script></body></html>
