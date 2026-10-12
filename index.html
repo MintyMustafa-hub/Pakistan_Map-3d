@@ -15,7 +15,7 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 #top small{font-weight:400;opacity:.75;display:block}
 #infow{bottom:calc(58px + env(safe-area-inset-bottom,0px));line-height:1.35}#info{max-height:32vh;overflow:auto}
 .hd{display:flex;justify-content:space-between;align-items:center;gap:10px}.tg{border:1px solid var(--bd);background:transparent;color:var(--tx);border-radius:12px;padding:3px 10px;font:inherit;font-weight:400}
-#chips{right:100px}#tm{position:fixed;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:9px 12px;background:var(--pn);z-index:2}
+#bar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;align-items:stretch;z-index:2}#bar #chips{position:static;flex:1;min-width:0}#tm,#rp{background:var(--pn);padding:9px 12px;white-space:nowrap}.lb{display:none}
 #top.col{right:auto;width:auto}#top.col .ttl,#top.col small{display:none}
 #infow.col{left:auto;width:auto}#infow.col #info,#infow.col .hd b{display:none}
 #chips{bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;overflow-x:auto;padding:6px}
@@ -23,12 +23,12 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 .c.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 #leg{top:calc(112px + env(safe-area-inset-top,0px));display:block;font-size:10px;line-height:1.5;padding:5px 8px}#leg div{display:inline-block;margin-right:9px;white-space:nowrap}body.tc #leg{top:calc(58px + env(safe-area-inset-top,0px))}#leg i{display:inline-block;width:12px;height:12px;border:1px solid #000;margin-right:6px;vertical-align:-2px}
 #info table{border-collapse:collapse;margin:6px 0}#info td{padding:2px 14px 2px 0;vertical-align:top}#info td:first-child{opacity:.7;white-space:nowrap}#info ul{margin:4px 0 0;padding-left:18px}
-@media(min-width:820px){#top{right:auto;width:290px}#infow{left:auto;right:8px;bottom:auto;top:calc(8px + env(safe-area-inset-top,0px));width:250px;font-size:12px}#info{max-height:calc(100vh - 150px)}#leg{right:auto;left:8px;top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:11px;line-height:1.55;padding:7px 10px}#leg div{display:block;margin:0}body.tc #leg{top:auto}#top.col,#infow.col{width:auto}}
+@media(min-width:820px){#top{right:auto;width:290px}#infow{left:auto;right:8px;bottom:auto;top:calc(8px + env(safe-area-inset-top,0px));width:250px;font-size:12px}#info{max-height:calc(100vh - 150px)}#leg{right:auto;left:8px;top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:11px;line-height:1.55;padding:7px 10px}#leg div{display:block;margin:0}body.tc #leg{top:auto}#top.col,#infow.col{width:auto}.lb{display:inline}}
 </style></head><body>
 <canvas id="cv"></canvas><div id="lab"></div>
 <div class="ui" id="top"><div class="hd"><span class="ttl">Pakistan 3D Topography Atlas</span><button class="tg" id="tb">Hide</button></div><small>Drag: rotate · Pinch/scroll: zoom · Two fingers/right-drag: pan · Tap a label for notes · Zoom in for more labels</small></div>
 <div class="ui" id="infow"><div class="hd"><b>Notes</b><button class="tg" id="ib">Hide</button></div><div id="info"><b>Pakistan Studies map.</b> Heights are exaggerated; boundaries and features are approximate (study aid, not a survey map).</div></div>
-<div class="ui" id="chips"></div><button class="c" id="tm"></button><div class="ui" id="leg"></div>
+<div id="bar"><div class="ui" id="chips"></div><button class="c" id="rp" title="Report a mistake"><span>⚑ Report</span><span class="lb"> a mistake</span></button><button class="c" id="tm"></button></div><div class="ui" id="leg"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const LON0=60,LON1=80,LAT0=22,LAT1=38.5,K=10,CL=.87,HS=1.45;
@@ -196,6 +196,7 @@ function sync(){for(const b of ch.querySelectorAll('.c'))if(b.dataset.k)b.classL
 function btn(t,k,fn){const b=document.createElement('button');b.className='c';b.textContent=t;if(k)b.dataset.k=k;b.onclick=fn;ch.appendChild(b)}
 btn('Show all',0,()=>{for(const k in on)on[k]=1;sync()});btn('Hide all',0,()=>{for(const k in on)on[k]=0;sync()});btn('Legend',0,()=>{const l=document.getElementById('leg');l.style.display=getComputedStyle(l).display=='none'?'block':'none'});btn('Reset view',0,()=>{A=0;El=.95;R=R0;T.set(7,0,-2)});
 for(const k in NAMES)btn(NAMES[k],k,()=>{on[k]=on[k]?0:1;sync()});
+document.getElementById('rp').onclick=()=>window.open('https://docs.google.com/forms/d/e/1FAIpQLSfNAkK-8pXp4tmlfI_QvHiGPTU_uBNgM0t3RBMq-qqMM4o8CQ/viewform','_blank','noopener');
 const FACTS={'PAKISTAN':[['Area','796,096 km²'],['Population','≈ 241.5 million (2023 census)'],['Capital','Islamabad'],['Independence','14 August 1947'],['Coastline','≈ 1,046 km'],['Highest point','K2, 8,611 m']],
 'AFGHANISTAN':[['Capital','Kabul'],['Type','Landlocked'],['Border with Pakistan','2,640 km (Durand Line, 1893)']],
 'INDIA':[['Capital','New Delhi'],['Border with Pakistan','3,323 km incl. LOC'],['Key lines','Radcliffe Line (1947), LOC (1972)']],
@@ -228,7 +229,7 @@ const FACTS={'PAKISTAN':[['Area','796,096 km²'],['Population','≈ 241.5 millio
 function tgl(w,b,on,off){const e=document.getElementById(w),x=document.getElementById(b);x.onclick=()=>{e.classList.toggle('col');x.textContent=e.classList.contains('col')?off:on;document.body.classList.toggle('tc',document.getElementById('top').classList.contains('col'))}}tgl('top','tb','Hide','Help');tgl('infow','ib','Hide','Notes');
 function show(l){const w=document.getElementById('infow');w.classList.remove('col');document.getElementById('ib').textContent='Hide';const f=FACTS[l.t],n=l.info.replace(/([.;])\s+/g,'$1\n').split('\n').filter(Boolean);inf.innerHTML='<b>'+l.t+'</b>'+(f?'<table>'+f.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>':'')+'<ul>'+n.map(s=>'<li>'+s+'</li>').join('')+'</ul>'}
 const tm=document.getElementById('tm'),rt=document.documentElement,isD=()=>rt.dataset.theme?rt.dataset.theme=='dark':matchMedia('(prefers-color-scheme: dark)').matches;
-function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);tm.textContent=isD()?'\u2600 Light':'\u263e Dark'}
+function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);tm.innerHTML=isD()?'<span>\u2600</span><span class="lb"> Light</span>':'<span>\u263e</span><span class="lb"> Dark</span>'}
 tm.onclick=()=>{rt.dataset.theme=isD()?'light':'dark';theme()};matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);theme();
 /* camera */
 let A=0,El=.95,R=230,T=new V(7,0,-2),TH=[0,1e9,170,100,60];
