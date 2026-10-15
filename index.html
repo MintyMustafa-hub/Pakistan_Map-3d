@@ -167,15 +167,15 @@ const LB=[],lab=document.getElementById('lab');
 function L(cat,t,lo,la,tier,info,cls,dy){if(cat==='plates')return;const el=document.createElement('div');el.className='l '+(cls||'');el.textContent=t;lab.appendChild(el);
 LB.push({cat,t,tier,info,el,p:new V(X(lo),yAt(lo,la)+(dy||1.5),Z(la)),w:t.length*(cls=='big'?11:7)+8,h:cls=='big'?20:15,sx:0,sy:0,s:0})}
 /* rivers */
-const RV=[['Indus',[[75.6,35.3],[74.9,35.5],[74.4,35.4],[74,35.2],[73,35],[72.7,34.3],[72.25,33.9],[71.8,33.2],[71.6,32.5],[70.9,31.8],[70.8,30.7],[70.4,29],[69.7,28.4],[68.9,27.7],[68.4,25.4],[68,24.8],[67.7,24.5]],.55,'Indus (~3,180 km): Pakistan\'s lifeline. Rises in Tibet, flows through Gilgit-Baltistan, KP, Punjab and Sindh and ends in the Arabian Sea in a delta near Thatta. Tarbela, Sukkur and Kotri barrages/dams are on it.'],
+const RV=[['Indus',[[80.1,31.6],[79.8,31.9],[79.5,32.2],[79.1,32.55],[78.8,32.9],[78.4,33.25],[78.0,33.65],[77.75,34.0],[77.58,34.15],[77.35,34.35],[76.95,34.55],[76.55,34.8],[76.1,35.05],[75.7,35.3],[75.2,35.48],[74.8,35.45],[74.45,35.3],[74.1,35.1],[73.8,34.9],[73.5,34.7],[73.2,34.45],[72.95,34.2],[72.7,34.05],[72.45,33.95],[72.25,33.9],[72.05,33.55],[71.8,33.2],[71.65,32.85],[71.6,32.5],[71.25,32.15],[70.95,31.8],[70.8,30.7],[70.45,29.85],[70.05,28.95],[69.7,28.4],[69.35,28.1],[68.9,27.7],[68.55,26.75],[68.4,25.4],[68.1,24.9],[67.7,24.5]],.55,'Indus (~3,180 km): Pakistan\'s lifeline. Rises in Tibet, flows through Gilgit-Baltistan, KP, Punjab and Sindh and ends in the Arabian Sea in a delta near Thatta. Tarbela, Sukkur and Kotri barrages/dams are on it.'],
 ['Kabul R.',[[69.2,34.5],[70,34.4],[71.1,34.2],[71.6,34],[72.25,33.9]],.3,'Kabul River: from Afghanistan via Khyber Pakhtunkhwa (Peshawar valley); joins the Indus at Attock.'],
 ['Gilgit R.',[[73.5,36.5],[74.3,35.9],[74.6,35.46]],.28,'Gilgit River: joins the Indus near Jaglot, Gilgit-Baltistan.'],
 ['Hunza R.',[[74.9,36.8],[74.7,36.3],[74.5,35.9],[74.45,35.75]],.25,'Hunza River: drains Karakoram glaciers; joins the Gilgit River.'],
 ['Swat R.',[[72.4,35.4],[72,34.8],[71.75,34.3],[71.6,34]],.22,'Swat River: flows through Swat valley and joins the Kabul River.'],
-['Jhelum',[[74.8,34.1],[74.2,34.2],[73.7,34],[73.5,34.4],[73.7,33.6],[73.6,33.15],[73.4,32.5],[72.5,32.1],[72.1,31.15]],.3,'Jhelum: rises in Kashmir, Mangla Dam on it; joins the Chenab at Trimmu. (Western river under the Indus Waters Treaty 1960.)'],
-['Chenab',[[74.5,32.9],[74.5,32.6],[73.5,32],[72.9,31.7],[72.4,31.3],[72.1,31.15],[71.8,30.7],[71.5,30.1],[71,29.35]],.3,'Chenab: enters Pakistan at Marala; joins the Jhelum, Ravi and Sutlej to form the Panjnad. (Western river.)'],
-['Ravi',[[74.8,32.5],[74.5,31.9],[74.2,31.6],[73.5,31],[72.4,30.6],[71.8,30.7]],.22,'Ravi: flows past Lahore; an Eastern river allocated to India under the Indus Waters Treaty 1960.'],
-['Sutlej',[[74.6,31.1],[73.9,30.4],[73.2,29.9],[72.5,29.5],[71.5,29.2],[71,29.35]],.25,'Sutlej: Eastern river; flows through Bahawalpur; joins the Chenab to form the Panjnad.'],
+['Jhelum',[[75.25,33.53],[75.22,33.61],[75.17,33.7],[75.12,33.78],[75.05,33.88],[74.98,33.97],[74.91,34.03],[74.88,34.08],[74.82,34.13],[74.75,34.18],[74.66,34.22],[74.55,34.28],[74.45,34.3],[74.37,34.24],[74.24,34.18],[74.12,34.11],[74.0,34.08],[73.85,34.14],[73.65,34.28],[73.47,34.37],[73.55,34.1],[73.62,33.85],[73.66,33.6],[73.64,33.35],[73.62,33.15],[73.74,32.94],[73.66,32.75],[73.56,32.57],[73.42,32.45],[73.2,32.3],[72.9,32.0],[72.6,31.7],[72.3,31.4],[72.1,31.15]],.3,'Jhelum: rises in Kashmir, Mangla Dam on it; joins the Chenab at Trimmu. (Western river under the Indus Waters Treaty 1960.)'],
+['Chenab',[[77.3,32.6],[77.05,32.72],[76.8,32.82],[76.55,32.9],[76.3,32.98],[76.05,33.0],[75.8,32.96],[75.55,32.88],[75.3,32.78],[75.05,32.7],[74.8,32.65],[74.55,32.62],[74.3,32.5],[74.0,32.35],[73.7,32.1],[73.5,31.95],[73.2,31.8],[72.9,31.7],[72.4,31.3],[72.1,31.15],[71.8,30.7],[71.5,30.1],[71,29.35]],.3,'Chenab: enters Pakistan at Marala; joins the Jhelum, Ravi and Sutlej to form the Panjnad. (Western river.)'],
+['Ravi',[[75.85,32.55],[75.65,32.35],[75.45,32.15],[75.25,31.95],[75.05,31.75],[74.9,31.58],[74.72,31.42],[74.55,31.25],[74.35,31.05],[74.05,30.8],[73.8,30.55],[73.45,30.45],[73.05,30.55],[72.65,30.62],[72.25,30.65],[71.8,30.7]],.22,'Ravi: flows past Lahore; an Eastern river allocated to India under the Indus Waters Treaty 1960.'],
+['Sutlej',[[78.4,31.2],[77.9,31.3],[77.3,31.35],[76.7,31.35],[76.1,31.3],[75.55,31.18],[75.05,31.05],[74.6,30.95],[74.25,30.65],[73.9,30.4],[73.2,29.9],[72.5,29.5],[71.5,29.2],[71,29.35]],.25,'Sutlej: Eastern river; flows through Bahawalpur; joins the Chenab to form the Panjnad.'],
 ['Panjnad',[[71,29.35],[70.4,29]],.35,'Panjnad: confluence of the five Punjab rivers; flows into the Indus at Mithankot.'],
 ['Gomal R.',[[69,32.4],[70.3,32],[70.9,31.8]],.2,'Gomal River: from Afghanistan/South Waziristan; joins the Indus near Dera Ismail Khan.']];
 for(const r of RV){tube(r[1],0x2fa8ff,r[2],G.rivers);const m=r[1][r[1].length>>1];L('rivers',r[0],m[0],m[1],r[2]>.5?2:3,r[3],'',1.2)}
@@ -196,11 +196,19 @@ stroke(BND.prov.balochistan,0x241c14,.42,BL,.42,false);
 stroke(BND.prov.kpk,0x241c14,.42,BL,.44,false);
 stroke(BND.prov.punjab,0x241c14,.42,BL,.46,false);
 stroke(BND.prov.gb,0x241c14,.42,BL,.48,false);
-stroke(BND.prov.ajk,0x241c14,.42,BL,.50,false);
+/* Treat Kashmir as one region: omit solid boundary segments that coincide with the LOC. */
+function withoutLocEdges(lines,tol=.16){
+ const out=[],cs=Math.cos(34*Math.PI/180);
+ function dseg(p,a,b){const px=p[0]*cs,py=p[1],ax=a[0]*cs,ay=a[1],bx=b[0]*cs,by=b[1],dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy||1)));return Math.hypot(px-(ax+t*dx),py-(ay+t*dy))}
+ function near(p){return LOC.some((q,i)=>i<LOC.length-1&&dseg(p,q[i],q[i+1])<tol)}
+ for(const line of lines){let chain=[];for(let i=0;i<line.length-1;i++){const a=line[i],b=line[i+1],m=[(a[0]+b[0])/2,(a[1]+b[1])/2];if(near(a)||near(m)||near(b)){if(chain.length>1)out.push(chain);chain=[]}else{if(!chain.length)chain.push(a);chain.push(b)}}if(chain.length>1)out.push(chain)}
+ return out;
+}
+stroke(withoutLocEdges(BND.prov.ajk),0x241c14,.42,BL,.50,false);
 G.ict=new THREE.Group();sc.add(G.ict);
 stroke(BND.prov.ict,0x241c14,.42,BL,.52,false);
 stroke([].concat(BND.iran,BND.afg,BND.china,BND.india,BND.coast),0x101418,.42,BL,.64,false);
-stroke([IOK],0x101418,.42,BL,.66,false);
+stroke(withoutLocEdges([IOK]),0x101418,.42,BL,.66,false);
 stroke(BND.loc,0xff2d2d,.32,G.loc,.9,true);
 const BT=[['Durand Line (Afghanistan)','2,640 km',BND.afg[0]],['Pakistan–Iran border','959 km',BND.iran[0],.72,34],['Pakistan–China border','523 km',BND.china[0]],['Pakistan–India border','3,323 km incl. LOC',BND.india[0],.34,46,0],['Arabian Sea coastline','1,046 km',BND.coast[0]]];
 [].forEach(b=>{const P=b[2],s=[];let L=0;for(let i=0;i<P.length-1;i++){const d=Math.hypot((P[i+1][0]-P[i][0])*CL,P[i+1][1]-P[i][1]);s.push(d);L+=d}let t=L/2,i=0;while(i<s.length-1&&t>s[i]){t-=s[i];i++}const f=t/s[i],lo=P[i][0]+(P[i+1][0]-P[i][0])*f,la=P[i][1]+(P[i+1][1]-P[i][1])*f;
@@ -250,7 +258,7 @@ const mesh=new THREE.Mesh(gm,new THREE.MeshBasicMaterial({map:tex,transparent:tr
 [['Line of Control (LOC)',75.3,34.65,1,'LOC: ~740 km de facto line in Kashmir, set by the 1972 Simla Agreement (from the 1949 Ceasefire Line). Pakistan administers AJK and Gilgit-Baltistan.','big'],['Siachen (NJ9842)',77.2,35.2,2,'Where the LOC ends at NJ9842; north of it the Actual Ground Position Line runs through Siachen.','']].forEach(p=>L('loc',p[0],p[1],p[2],p[3],p[4],p[5],3));
 const sp=new THREE.SphereGeometry(.55,10,8);
 [['Islamabad',73.05,33.7,1,'Islamabad: federal capital (ICT), at Margalla Hills.'],['Karachi',67,24.86,1,'Karachi: largest city, port, capital of Sindh.'],['Lahore',74.35,31.55,1,'Lahore: capital of Punjab; Ravi River.'],['Quetta',67,30.2,2,'Quetta: capital of Balochistan; in the Suleiman/Toba Kakar belt.'],['Peshawar',71.58,34,2,'Peshawar: capital of Khyber Pakhtunkhwa; near Khyber Pass.'],['Gilgit',74.3,35.9,2,'Gilgit: capital of Gilgit-Baltistan.'],['Muzaffarabad',73.47,34.37,3,'Muzaffarabad: capital of Azad Jammu & Kashmir.'],['Hyderabad',68.37,25.4,3,'Hyderabad, Sindh.'],['Multan',71.47,30.2,3,'Multan: "city of saints", south Punjab.'],['Faisalabad',73.07,31.4,3,'Faisalabad: textile hub.'],['Gwadar',62.3,25.1,3,'Gwadar: deep-sea port, CPEC.'],['Skardu',75.57,35.3,3,'Skardu: gateway to K2 and Baltoro.'],['Sukkur',68.86,27.7,3,'Sukkur Barrage on the Indus.'],['Chitral',71.78,35.85,3,'Chitral: below Tirich Mir.'],['Kabul',69.2,34.5,2,'Kabul: capital of Afghanistan.'],['New Delhi',77.2,28.6,2,'New Delhi: capital of India.']].forEach(p=>{dot(G.cities,sp,0xffffff,p[1],p[2],.5);L('cities',p[0],p[1],p[2],p[3],p[4],'',1.6)});
-[['Punjab',72.8,31.2,2,'Punjab: most populous province; capital Lahore; "land of five rivers".','big'],['Sindh',68.8,26.3,2,'Sindh: capital Karachi; Indus delta and Thar.','big'],['Balochistan',65.5,28,2,'Balochistan: largest province by area (~44%); capital Quetta.','big'],['Khyber Pakhtunkhwa',72.2,34.5,2,'KP: capital Peshawar.','big'],['Gilgit-Baltistan',75.3,35.9,2,'Gilgit-Baltistan: Karakoram region; capital Gilgit.','big'],['Kashmir',74.7,34.1,3,'Kashmir region shown according to Pakistan’s official position. The LOC remains a line of control; territory east of it is administered by India.','big']].forEach(p=>L('provinces',p[0],p[1],p[2],p[3],p[4],p[5],2));
+[['Punjab',72.8,31.2,2,'Punjab: most populous province; capital Lahore; "land of five rivers".','big'],['Sindh',68.8,26.3,2,'Sindh: capital Karachi; Indus delta and Thar.','big'],['Balochistan',65.5,28,2,'Balochistan: largest province by area (~44%); capital Quetta.','big'],['Khyber Pakhtunkhwa',72.2,34.5,2,'KP: capital Peshawar.','big'],['Gilgit-Baltistan',75.3,35.9,2,'Gilgit-Baltistan: Karakoram region; capital Gilgit.','big'],['Kashmir',75.8,33.4,3,'Kashmir region shown according to Pakistan’s official position. The LOC remains a line of control; territory east of it is administered by India.','big']].forEach(p=>L('provinces',p[0],p[1],p[2],p[3],p[4],p[5],2));
 [['Kandahar',65.7,31.6,'Kandahar: southern Afghanistan.'],['Jalalabad',70.45,34.43,'Jalalabad: Afghanistan, on the Kabul River along the Torkham/Khyber route.'],['Zahedan',60.86,29.5,'Zahedan: Iran, near the Pakistan border (Taftan route).'],['Amritsar',74.87,31.63,'Amritsar: India, ~30 km from Lahore (Attari–Wagah crossing).'],['Srinagar',74.8,34.08,'Srinagar: Kashmir valley on the Jhelum (Indian-administered).'],['Leh',77.58,34.15,'Leh: Ladakh, on the upper Indus.']].forEach(p=>{dot(G.cities,sp,0xdddddd,p[1],p[2],.5);L('cities',p[0],p[1],p[2],3,p[3],'',1.6)});
 if(0)L('rivers','Helmand R. (Afghanistan)',64.5,31.5,3,'Helmand: Afghanistan\'s longest river; ends in the Hamun lakes on the Iran border.','',1.2);
 /* neighbour outlines come from Natural Earth, see BND.other */
@@ -337,7 +345,8 @@ cv.addEventListener('contextmenu',e=>e.preventDefault());
 const v=new V();
 function frame(){cam.position.set(T.x+R*Math.cos(El)*Math.sin(A),T.y+R*Math.sin(El),T.z+R*Math.cos(El)*Math.cos(A));cam.lookAt(T);rd.render(sc,cam);
 const W=innerWidth,H=innerHeight,used=[];
-for(const l of LB){let s=(l.cat==='provinces'?on.provinces:on[l.cat])&&R<TH[l.tier];
+const labelOrder=[...LB].sort((a,b)=>(a.cat==='provinces'?0:1)-(b.cat==='provinces'?0:1));
+for(const l of labelOrder){let s=(l.cat==='provinces'?on.provinces:on[l.cat])&&R<TH[l.tier];
 if(s){v.copy(l.p).project(cam);if(v.z>1||Math.abs(v.x)>1.05||Math.abs(v.y)>1.05)s=false;else{const x=(v.x+1)/2*W,y=(1-v.y)/2*H,a=x-l.w/2,b=y-l.h/2;
 for(const u of used)if(a<u[2]&&a+l.w>u[0]&&b<u[3]&&b+l.h>u[1]){s=false;break}
 if(s){used.push([a,b,a+l.w,b+l.h]);l.sx=x;l.sy=y;l.el.style.transform='translate('+(x-l.w/2)+'px,'+(y-l.h/2)+'px)'}}}
