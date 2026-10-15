@@ -31,7 +31,7 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 .c.mix{border-color:var(--ac);color:var(--ac);box-shadow:inset 0 0 0 1px var(--ac)}
 #leg{top:calc(165px + env(safe-area-inset-top,0px));display:block;font-size:10px;line-height:1.5;padding:5px 8px}#leg div{display:inline-block;margin-right:9px;white-space:nowrap}body.tc #leg{top:calc(140px + env(safe-area-inset-top,0px))}#leg i{display:inline-block;width:12px;height:12px;border:1px solid #000;margin-right:6px;vertical-align:-2px}
 #info table{border-collapse:collapse;margin:6px 0}#info td{padding:2px 14px 2px 0;vertical-align:top}#info td:first-child{opacity:.7;white-space:nowrap}#info ul{margin:4px 0 0;padding-left:18px}
-@media(min-width:820px){body #quick{position:fixed!important;left:auto!important;right:calc(8px + env(safe-area-inset-right,0px))!important;top:calc(8px + env(safe-area-inset-top,0px))!important;width:fit-content!important;max-width:calc(100vw - 32px)!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:flex-end!important;align-items:center!important;gap:6px!important;z-index:10!important}#top{top:calc(8px + env(safe-area-inset-top,0px));right:auto;width:390px}#infow{left:auto;right:8px;bottom:auto;top:calc(58px + env(safe-area-inset-top,0px));width:250px;font-size:12px}#infow{height:auto;min-height:0;max-height:min(62vh,560px);}#info{height:auto;max-height:calc(62vh - 52px);flex:0 1 auto;min-height:0;overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}#leg{right:auto;left:8px;top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:11px;line-height:1.55;padding:7px 10px}#leg div{display:block;margin:0}body.tc #leg{top:auto}#top.col,#infow.col{width:auto}.lb{display:inline}}
+@media(min-width:820px){#top{top:calc(8px + env(safe-area-inset-top,0px));right:auto;width:390px}#infow{left:auto;right:8px;bottom:auto;top:calc(58px + env(safe-area-inset-top,0px));width:250px;font-size:12px}#infow{height:auto;min-height:0;max-height:min(62vh,560px);}#info{height:auto;max-height:calc(62vh - 52px);flex:0 1 auto;min-height:0;overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}#leg{right:auto;left:8px;top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:11px;line-height:1.55;padding:7px 10px}#leg div{display:block;margin:0}body.tc #leg{top:auto}#top.col,#infow.col{width:auto}.lb{display:inline}}
 @media(max-height:520px) and (orientation:landscape){#top{top:calc(8px + env(safe-area-inset-top,0px));right:auto;width:auto;max-width:46vw}#quick{left:auto;right:calc(8px + env(safe-area-inset-right,0px));top:calc(8px + env(safe-area-inset-top,0px));max-width:48vw;justify-content:flex-end;background:transparent;border:0;border-radius:0;padding:0}#top small{padding-right:4px}#top small{display:none}#infow{left:auto;right:calc(8px + env(safe-area-inset-right,0px));bottom:auto;top:calc(58px + env(safe-area-inset-top,0px));width:220px;font-size:11px}#infow{height:auto;min-height:0;max-height:min(58vh,300px);}#info{height:auto;max-height:calc(58vh - 52px);flex:0 1 auto;min-height:0;overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}#leg{right:auto;left:calc(8px + env(safe-area-inset-left,0px));top:calc(112px + env(safe-area-inset-top,0px));bottom:auto;width:auto;font-size:10px;line-height:1.4;padding:5px 8px}#leg div{display:block;margin:0}body.tc #leg{top:calc(80px + env(safe-area-inset-top,0px))}#chips{padding:3px 6px}.c{padding:4px 10px}#quick .c{padding:4px 8px}}
 
 /* Legend placement refinement: keep it high and clear of Help/instructions on phones. */
@@ -173,9 +173,27 @@ const add=a=>g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCur
 if(dash){for(let i=0;i+3<v.length;i+=6)add(v.slice(i,i+4))}else add(v);if(col===0x2fa8ff)edge(v,r,g)}
 function dot(g,geom,col,lo,la,dy){if((g===G.cities||g===G.mountains)&&!inPakistan(lo,la))return;const m=new THREE.Mesh(geom,new THREE.MeshLambertMaterial({color:col}));m.position.set(X(lo),yAt(lo,la)+dy,Z(la));g.add(m)}
 /* labels */
+const BORDER_IMAGES=[];
 const LB=[],lab=document.getElementById('lab');
 function L(cat,t,lo,la,tier,info,cls,dy){if(cat==='plates')return;if(PLACE_CATS.has(cat)&&!KEEP_FOREIGN.has(t)&&!inPakistan(lo,la))return;const el=document.createElement('div');el.className='l '+(cls||'');el.textContent=t;lab.appendChild(el);
-LB.push({cat,t,tier,info,el,p:new V(X(lo),yAt(lo,la)+(dy||1.5),Z(la)),w:t.length*(cls=='big'?11:7)+8,h:cls=='big'?20:15,sx:0,sy:0,s:0})}
+const hierarchy=labelHierarchy(cat,t,tier,cls);
+el.style.visibility='hidden';el.style.display='block';const bounds=el.getBoundingClientRect();el.style.display='none';el.style.visibility='';
+LB.push({cat,t,tier,info,el,p:new V(X(lo),yAt(lo,la)+(dy||1.5),Z(la)),w:bounds.width,h:bounds.height,sx:0,sy:0,s:0,...hierarchy,zoomVisible:false})}
+/* Smaller normalized camera distances reveal progressively finer existing data.
+   No feature positions, label text, fonts, or layer controls are changed. */
+function labelHierarchy(cat,t,tier,cls){
+ if(t==='PAKISTAN')return {limit:Infinity,priority:0};
+ if(['ARABIAN SEA','Indus','Karakoram Range','Himalaya','Hindu Kush','Balochistan Plateau','Thar Desert'].includes(t))return {limit:Infinity,priority:10+tier};
+ if(['AFGHANISTAN','INDIA','CHINA','IRAN'].includes(t))return {limit:Infinity,priority:20};
+ if(cat==='provinces')return {limit:.86,priority:5};
+ if(cat==='loc')return {limit:tier===1?.86:.43,priority:30+tier};
+ if(cat==='rivers')return {limit:t==='INDUS DELTA'?.86:['Jhelum','Chenab','Ravi','Sutlej','Kabul R.'].includes(t)?.78:tier===4?.24:.44,priority:40+tier};
+ if(cat==='mountains')return {limit:cls==='big'?(tier<=2?.82:.58):tier===4?.24:.47,priority:cls==='big'?35+tier:60+tier};
+ if(cat==='plateaus'||cat==='deserts')return {limit:tier<=2?.82:tier===3?.48:.24,priority:45+tier};
+ if(cat==='cities')return {limit:tier===1?.53:tier===2?.44:.30,priority:70+tier};
+ if(cat==='glaciers'||cat==='forests')return {limit:tier===4?.24:tier===3?.36:.46,priority:65+tier};
+ return {limit:tier<=2?.78:tier===3?.40:.24,priority:55+tier};
+}
 /* River paths: geographically refined regional waypoints; Catmull–Rom interpolation renders smooth curves between them. These are educational-scale centerlines, not survey-grade hydrographic vectors. */
 const RV=[['Indus',INDUS_PTS,.55,'Indus (~3,180 km): Pakistan\'s lifeline. Rises in Tibet, flows through Gilgit-Baltistan, KP, Punjab and Sindh and ends in the Arabian Sea in a delta near Thatta. Tarbela, Sukkur and Kotri barrages/dams are on it.'],
 ['Kabul R.',[[69.2,34.5],[70,34.4],[71.1,34.2],[71.6,34],[72.25,33.9]],.3,'Kabul River: from Afghanistan via Khyber Pakhtunkhwa (Peshawar valley); joins the Indus at Attock.'],
@@ -244,6 +262,13 @@ tube(PL[0],0xff5a36,.4,G.plates);PT.forEach(l=>tube(l,0xffd23a,.4,G.plates));tub
 [['INDIAN PLATE',71,27.8,1,'Indian Plate: Pakistan\'s east and south. Moves north ~4–5 cm/yr, colliding with Eurasia ~50 million years ago to raise the Himalaya, Karakoram and Hindu Kush.','big'],['EURASIAN PLATE',64.5,33.5,1,'Eurasian Plate: north-western Pakistan, Afghanistan. Balochistan\'s Chaman area is its transform contact with the Indian Plate.','big'],['ARABIAN PLATE',62.5,23.2,1,'Arabian Plate: subducts beneath the Eurasian Plate at the Makran Subduction Zone.','big'],['Makran Subduction Zone',63.5,24.5,2,'Convergent boundary off Balochistan; caused the 1945 Makran earthquake and tsunami.',''],['Chaman Fault',66.4,30.2,3,'Chaman Fault: left-lateral transform boundary between the Indian and Eurasian plates.',''],['Owen Fracture Zone',66.3,23.4,3,'Transform boundary between the Arabian and Indian plates.',''],['Main Mantle Thrust',73.7,35.1,3,'Main Mantle Thrust: Himalayan suture zone; the 2005 Kashmir earthquake struck nearby.','']].forEach(p=>L('plates',p[0],p[1],p[2],p[3],p[4],p[5],2));
 
 PLI.forEach(p=>L('plateaus',p[4],p[0],p[1],p[5],p[6],p[5]==1?'big':'',3));
+const BORDER_NOTES={
+ 'Durand Line (Afghanistan)':{info:'The displayed measurement is the atlas’s established length of the Pakistan–Afghanistan border, known as the Durand Line (1893). It runs along Pakistan’s western and north-western frontier; the Wakhan Corridor separates Pakistan from Tajikistan.',wiki:'https://en.wikipedia.org/wiki/Durand_Line'},
+ 'Pakistan–Iran border':{info:'The displayed measurement is the atlas’s established length of the land border between Pakistan and Iran. It adjoins Balochistan in south-western Pakistan; Taftan is an important crossing. The atlas associates it with the Goldsmid line (1871) and the 1958 boundary agreement.',wiki:'https://en.wikipedia.org/wiki/Iran%E2%80%93Pakistan_border'},
+ 'Pakistan–China border':{info:'The displayed measurement is the atlas’s established length of the Pakistan–China border in the Karakoram. The 1963 boundary agreement is part of its geographical context. The Karakoram Highway crosses at Khunjerab Pass (4,693 m in this atlas).',wiki:'https://en.wikipedia.org/wiki/China%E2%80%93Pakistan_border'},
+ 'Pakistan–India border':{info:'This atlas’s displayed total includes the Line of Control (LOC); it is not a measurement solely of the permanent international border. The Radcliffe Line dates to Partition in 1947. The LOC in Kashmir is a de facto line of control, not an international boundary; Sir Creek is a disputed area in the south.',wiki:'https://en.wikipedia.org/wiki/India%E2%80%93Pakistan_border'},
+ 'Arabian Sea coastline':{info:'The displayed measurement is the atlas’s established length of Pakistan’s coast along the Arabian Sea, not a land border. It extends along Balochistan and Sindh and includes Gwadar, Ormara, Karachi and the Indus Delta. The coast supports ports, trade and mangrove wetlands.',wiki:'https://en.wikipedia.org/wiki/Coastline_of_Pakistan'}
+};
 BT.forEach(b=>{const P=b[2].map(p=>[X(p[0]),Z(p[1])]),cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const TL=cum[cum.length-1];
 const at=s=>{s=Math.min(TL,Math.max(0,s));let i=1;while(i<P.length-1&&cum[i]<s)i++;const f=(s-cum[i-1])/(cum[i]-cum[i-1]||1);return[P[i-1][0]+(P[i][0]-P[i-1][0])*f,P[i-1][1]+(P[i][1]-P[i-1][1])*f]};
 const tg=s=>{const a=at(s-16),e=at(s+16),dx=e[0]-a[0],dz=e[1]-a[1],l=Math.hypot(dx,dz)||1;return[dx/l,dz/l]};
@@ -258,7 +283,9 @@ const tex=new THREE.CanvasTexture(cv2);tex.anisotropy=rd.capabilities.getMaxAnis
 const YM=Math.max(...Q.map(q=>{const g=w2g(q[0],q[1]);return yAt(g[0],g[1])}))+1.5;const gm=new THREE.BufferGeometry(),pos=[],uv=[],idx=[];
 for(let k=0;k<=32;k++){const a=Q[2*k],c2=Q[2*k+1],ga=w2g(a[0],a[1]),gc=w2g(c2[0],c2[1]),y=YM;pos.push(a[0],y,a[1],c2[0],y,c2[1]);uv.push(k/32,0,k/32,1);if(k<32){const i=2*k;idx.push(i,i+1,i+2,i+1,i+3,i+2)}}
 gm.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));gm.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));gm.setIndex(idx);
-const mesh=new THREE.Mesh(gm,new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide}));mesh.renderOrder=2;G.borders.add(mesh)});
+const mesh=new THREE.Mesh(gm,new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,side:THREE.DoubleSide}));mesh.renderOrder=2;G.borders.add(mesh);
+// Keep the original texture and mesh; retain its alpha mask for precise hit testing.
+BORDER_IMAGES.push({mesh,t:b[0],measurement:b[1],pixels:x2.getImageData(0,0,cv2.width,cv2.height),info:BORDER_NOTES[b[0]].info,wiki:BORDER_NOTES[b[0]].wiki});});
 /* forests, glaciers, deserts */
 [['Himalayan Moist Temperate Forests',73.3,34.1,2,'Galiyat/Murree/Neelum: pine, fir, deciduous forests.'],['Swat–Dir–Chitral Coniferous Forests',71.8,35.1,2,'Deodar, blue pine and spruce forests of northern KP.'],['Ziarat Juniper Forest',67.7,30.4,3,'One of the world\'s largest juniper forests, Balochistan.'],['Indus Delta Mangroves',67.8,24.4,3,'Mangroves (Avicennia marina), Sindh coast; among the largest arid-climate mangrove forests.'],['Changa Manga (planted)',74,31.1,4,'Man-made irrigated forest near Lahore.']].forEach(p=>L('forests',p[0],p[1],p[2],p[3],p[4],'',1.5));
 [['Siachen Glacier',77.1,35.4,2,'Siachen: ~76 km, longest glacier in the Karakoram; world\'s highest battlefield.'],['Baltoro Glacier',76.4,35.7,2,'Baltoro: ~63 km; route to K2 base camp.'],['Biafo–Hispar',75.5,35.95,2,'Biafo & Hispar glaciers form the longest glacial system outside the polar regions.'],['Batura Glacier',74.5,36.45,3,'Batura: ~57 km, Hunza.'],['Rakaposhi–Nanga glaciers',74.7,35.7,4,'Pakistan holds ~7,000+ glaciers, more than anywhere outside the polar regions.']].forEach(p=>L('glaciers',p[0],p[1],p[2],p[3],p[4],'',3));
@@ -327,12 +354,12 @@ const FACTS={'PAKISTAN':[['Area','796,096 km²'],['Population','≈ 241.5 millio
 'Karachi':[['Province','Sindh'],['Role','Largest city and main port']],
 'Lahore':[['Province','Punjab'],['River','Ravi']]};
 function tgl(w,b,on,off){const e=document.getElementById(w),x=document.getElementById(b);x.onclick=()=>{e.classList.toggle('col');x.textContent=e.classList.contains('col')?off:on;document.body.classList.toggle('tc',document.getElementById('top').classList.contains('col'))}}tgl('top','tb','Hide','Help');tgl('infow','ib','Hide','Notes');
-function show(l){const w=document.getElementById('infow');w.classList.remove('col');document.getElementById('ib').textContent='Hide';const f=FACTS[l.t],n=l.info.replace(/([.;])\s+/g,'$1\n').split('\n').filter(Boolean);inf.innerHTML='<b>'+l.t+'</b>'+(f?'<table>'+f.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>':'')+'<ul>'+n.map(s=>'<li>'+s+'</li>').join('')+'</ul>'}
+function show(l){const w=document.getElementById('infow');w.classList.remove('col');document.getElementById('ib').textContent='Hide';const f=FACTS[l.t],n=l.info.replace(/([.;])\s+/g,'$1\n').split('\n').filter(Boolean);inf.innerHTML='<b>'+l.t+'</b>'+(f?'<table>'+f.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>':'')+'<ul>'+n.map(s=>'<li>'+s+'</li>').join('')+'</ul>'+(l.wiki?'<p><a href="'+l.wiki+'" target="_blank" rel="noopener noreferrer">Wikipedia: '+l.t+'</a></p>':'');if(l.measurement)inf.querySelector('b').insertAdjacentHTML('afterend','<table><tr><td>Length (atlas)</td><td>'+l.measurement+'</td></tr></table>');inf.scrollTop=0}
 const tm=document.getElementById('tm'),rt=document.documentElement,isD=()=>rt.dataset.theme?rt.dataset.theme=='dark':matchMedia('(prefers-color-scheme: dark)').matches;
 function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);tm.innerHTML=isD()?'<span>\u2600</span><span class="lb"> Light</span>':'<span>\u263e</span><span class="lb"> Dark</span>'}
 tm.onclick=()=>{rt.dataset.theme=isD()?'light':'dark';theme()};matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);theme();
 /* camera */
-let A=0,El=.95,R=230,T=new V(7,0,-2),TH=[0,1e9,500,100,60],touched=false;const fit=()=>Math.min(480,Math.max(230,210/cam.aspect));
+let A=0,El=.95,R=230,T=new V(7,0,-2),touched=false;const fit=()=>Math.min(480,Math.max(230,210/cam.aspect));
 function setView(which){
   touched=true;A=0;El=.95;
   if(which==='north'){T.set(X(74.8),0,Z(35.4));R=Math.min(145,Math.max(105,fit()*.48));}
@@ -350,19 +377,43 @@ cv.addEventListener('pointerdown',e=>{touched=true;cv.setPointerCapture(e.pointe
 cv.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);p[0]=e.clientX;p[1]=e.clientY;
 if(P.size==1){if(p[2]==2||e.shiftKey)pan(dx,dy);else{A-=dx*.006;El=Math.min(1.5,Math.max(.15,El+dy*.006))}}
 else if(P.size==2){const m=mid();R=Math.min(560,Math.max(28,R*ld/Math.max(1,m[2])));pan(m[0]-lm[0],m[1]-lm[1]);lm=[m[0],m[1]];ld=m[2]}});
-const up=e=>{if(P.size==1&&moved<8){let b=null,bd=1600;for(const l of LB)if(l.s&&l.info){const d=(l.sx-e.clientX)**2+(l.sy-e.clientY)**2;if(d<bd){bd=d;b=l}}if(b)show(b)}P.delete(e.pointerId)};
+const borderRay=new THREE.Raycaster(),borderPoint=new THREE.Vector2();
+function pickBorder(x,y,touch=false){
+ if(!G.borders.visible)return null;
+ const samples=touch?[[0,0],[-3,0],[3,0],[0,-3],[0,3]]:[[0,0]];
+ for(const [dx,dy] of samples){
+  borderPoint.set((x+dx)/innerWidth*2-1,-(y+dy)/innerHeight*2+1);borderRay.setFromCamera(borderPoint,cam);
+  const hits=borderRay.intersectObjects(BORDER_IMAGES.map(b=>b.mesh),false);
+  for(const hit of hits){const b=BORDER_IMAGES.find(b=>b.mesh===hit.object);if(!b||!hit.uv)continue;
+   const px=Math.min(b.pixels.width-1,Math.max(0,Math.floor(hit.uv.x*b.pixels.width))),py=Math.min(b.pixels.height-1,Math.max(0,Math.floor((1-hit.uv.y)*b.pixels.height)));
+   if(b.pixels.data[(py*b.pixels.width+px)*4+3]<24)continue;
+   const terrain=sc.children.find(o=>o.geometry===geo),ground=terrain?borderRay.intersectObject(terrain,false)[0]:null;
+   if(ground&&ground.distance<hit.distance-.15)continue;
+   return b;
+  }
+ }
+ return null;
+}
+const up=e=>{if(P.size==1&&moved<8){const image=pickBorder(e.clientX,e.clientY,e.pointerType==='touch');if(image){show(image);P.delete(e.pointerId);return;}let b=null,bd=1600;for(const l of LB)if(l.s&&l.info){const d=(l.sx-e.clientX)**2+(l.sy-e.clientY)**2;if(d<bd){bd=d;b=l}}if(b)show(b)}P.delete(e.pointerId)};
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>P.delete(e.pointerId));
 cv.addEventListener('wheel',e=>{touched=true;e.preventDefault();R=Math.min(560,Math.max(28,R*Math.exp(e.deltaY*.001)))},{passive:false});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
-const v=new V();
+const v=new V(),labelOrder=[...LB].sort((a,b)=>a.priority-b.priority||a.tier-b.tier||LB.indexOf(a)-LB.indexOf(b));
 function frame(){cam.position.set(T.x+R*Math.cos(El)*Math.sin(A),T.y+R*Math.sin(El),T.z+R*Math.cos(El)*Math.cos(A));cam.lookAt(T);rd.render(sc,cam);
-const W=innerWidth,H=innerHeight,used=[];
-const labelOrder=[...LB].sort((a,b)=>(a.cat==='provinces'?0:1)-(b.cat==='provinces'?0:1));
-for(const l of labelOrder){let s=(l.cat==='provinces'?on.provinces:on[l.cat])&&R<TH[l.tier];
-if(s){v.copy(l.p).project(cam);if(v.z>1||Math.abs(v.x)>1.05||Math.abs(v.y)>1.05)s=false;else{const x=(v.x+1)/2*W,y=(1-v.y)/2*H,a=x-l.w/2,b=y-l.h/2;
-if(l.cat!=='provinces')for(const u of used)if(a<u[2]&&a+l.w>u[0]&&b<u[3]&&b+l.h>u[1]){s=false;break}
-if(s){used.push([a,b,a+l.w,b+l.h]);l.sx=x;l.sy=y;l.el.style.transform='translate('+(x-l.w/2)+'px,'+(y-l.h/2)+'px)'}}}
-l.s=s;l.el.style.display=s?'block':'none'}
+const W=innerWidth,H=innerHeight,used=[],zoom=R/fit();
+for(const l of labelOrder){
+ // Independent eligibility state prevents collision rejection from resetting zoom hysteresis.
+ if(l.limit===Infinity)l.zoomVisible=true;
+ else if(l.zoomVisible&&zoom>l.limit*1.06)l.zoomVisible=false;
+ else if(!l.zoomVisible&&zoom<l.limit*.94)l.zoomVisible=true;
+ let s=!!on[l.cat]&&l.zoomVisible;
+ if(s){v.copy(l.p).project(cam);if(v.z< -1||v.z>1||Math.abs(v.x)>1.05||Math.abs(v.y)>1.05)s=false;
+ else{const x=(v.x+1)/2*W,y=(1-v.y)/2*H,a=x-l.w/2,b=y-l.h/2,pad=l.s?2:6;
+ for(const u of used)if(a-pad<u[2]&&a+l.w+pad>u[0]&&b-pad<u[3]&&b+l.h+pad>u[1]){s=false;break;}
+ if(s){used.push([a,b,a+l.w,b+l.h]);l.sx=x;l.sy=y;l.el.style.transform='translate('+a+'px,'+b+'px)';}
+ }}
+ l.s=s;l.el.style.display=s?'block':'none';
+}
 requestAnimationFrame(frame)}
 document.getElementById('leg').style.display='block';legendVisible=true;sync();frame();
 </script></body></html>
