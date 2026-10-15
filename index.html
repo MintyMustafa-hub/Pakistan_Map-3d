@@ -36,6 +36,8 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 
 /* Legend placement refinement: keep it high and clear of Help/instructions on phones. */
 @media (orientation: portrait) and (max-width: 819px) {
+  /* Lift the title/instruction panel slightly; keep it below the top action buttons. */
+  #top { top: calc(48px + env(safe-area-inset-top,0px)); }
   #leg { top: calc(125px + env(safe-area-inset-top,0px)); bottom: auto; }
   body.tc #leg { top: calc(100px + env(safe-area-inset-top,0px)); bottom: auto; }
 }
