@@ -169,9 +169,9 @@ LB.push({cat,t,tier,info,el,p:new V(X(lo),yAt(lo,la)+(dy||1.5),Z(la)),w:t.length
 /* rivers */
 const RV=[['Indus',[[80.1,31.6],[79.8,31.9],[79.5,32.2],[79.1,32.55],[78.8,32.9],[78.4,33.25],[78.0,33.65],[77.75,34.0],[77.58,34.15],[77.35,34.35],[76.95,34.55],[76.55,34.8],[76.1,35.05],[75.7,35.3],[75.2,35.48],[74.8,35.45],[74.45,35.3],[74.1,35.1],[73.8,34.9],[73.5,34.7],[73.2,34.45],[72.95,34.2],[72.7,34.05],[72.45,33.95],[72.25,33.9],[72.05,33.55],[71.8,33.2],[71.65,32.85],[71.6,32.5],[71.25,32.15],[70.95,31.8],[70.8,30.7],[70.45,29.85],[70.05,28.95],[69.7,28.4],[69.35,28.1],[68.9,27.7],[68.55,26.75],[68.4,25.4],[68.1,24.9],[67.7,24.5]],.55,'Indus (~3,180 km): Pakistan\'s lifeline. Rises in Tibet, flows through Gilgit-Baltistan, KP, Punjab and Sindh and ends in the Arabian Sea in a delta near Thatta. Tarbela, Sukkur and Kotri barrages/dams are on it.'],
 ['Kabul R.',[[69.2,34.5],[70,34.4],[71.1,34.2],[71.6,34],[72.25,33.9]],.3,'Kabul River: from Afghanistan via Khyber Pakhtunkhwa (Peshawar valley); joins the Indus at Attock.'],
-['Gilgit R.',[[73.5,36.5],[74.3,35.9],[74.6,35.46]],.28,'Gilgit River: joins the Indus near Jaglot, Gilgit-Baltistan.'],
-['Hunza R.',[[74.9,36.8],[74.7,36.3],[74.5,35.9],[74.45,35.75]],.25,'Hunza River: drains Karakoram glaciers; joins the Gilgit River.'],
-['Swat R.',[[72.4,35.4],[72,34.8],[71.75,34.3],[71.6,34]],.22,'Swat River: flows through Swat valley and joins the Kabul River.'],
+['Gilgit R.',[[72.7,36.1],[72.95,36.05],[73.15,36.0],[73.35,36.0],[73.55,36.05],[73.7,35.95],[73.9,35.8],[74.1,35.7],[74.3,35.6],[74.5,35.52],[74.6,35.46]],.28,'Gilgit River: joins the Indus near Jaglot, Gilgit-Baltistan.'],
+['Hunza R.',[[75.15,37.0],[75.05,36.8],[74.98,36.62],[74.92,36.45],[74.87,36.3],[74.78,36.12],[74.68,35.98],[74.58,35.88],[74.5,35.82],[74.45,35.75]],.25,'Hunza River: drains Karakoram glaciers; joins the Gilgit River.'],
+['Swat R.',[[72.57,35.7],[72.55,35.48],[72.5,35.25],[72.46,35.05],[72.42,34.88],[72.36,34.78],[72.25,34.7],[72.12,34.66],[72.0,34.65],[71.9,34.52],[71.8,34.38],[71.72,34.22],[71.6,34.0]],.22,'Swat River: flows through Swat valley and joins the Kabul River.'],
 ['Jhelum',[[75.25,33.53],[75.22,33.61],[75.17,33.7],[75.12,33.78],[75.05,33.88],[74.98,33.97],[74.91,34.03],[74.88,34.08],[74.82,34.13],[74.75,34.18],[74.66,34.22],[74.55,34.28],[74.45,34.3],[74.37,34.24],[74.24,34.18],[74.12,34.11],[74.0,34.08],[73.85,34.14],[73.65,34.28],[73.47,34.37],[73.55,34.1],[73.62,33.85],[73.66,33.6],[73.64,33.35],[73.62,33.15],[73.74,32.94],[73.66,32.75],[73.56,32.57],[73.42,32.45],[73.2,32.3],[72.9,32.0],[72.6,31.7],[72.3,31.4],[72.1,31.15]],.3,'Jhelum: rises in Kashmir, Mangla Dam on it; joins the Chenab at Trimmu. (Western river under the Indus Waters Treaty 1960.)'],
 ['Chenab',[[77.3,32.6],[77.05,32.72],[76.8,32.82],[76.55,32.9],[76.3,32.98],[76.05,33.0],[75.8,32.96],[75.55,32.88],[75.3,32.78],[75.05,32.7],[74.8,32.65],[74.55,32.62],[74.3,32.5],[74.0,32.35],[73.7,32.1],[73.5,31.95],[73.2,31.8],[72.9,31.7],[72.4,31.3],[72.1,31.15],[71.8,30.7],[71.5,30.1],[71,29.35]],.3,'Chenab: enters Pakistan at Marala; joins the Jhelum, Ravi and Sutlej to form the Panjnad. (Western river.)'],
 ['Ravi',[[75.85,32.55],[75.65,32.35],[75.45,32.15],[75.25,31.95],[75.05,31.75],[74.9,31.58],[74.72,31.42],[74.55,31.25],[74.35,31.05],[74.05,30.8],[73.8,30.55],[73.45,30.45],[73.05,30.55],[72.65,30.62],[72.25,30.65],[71.8,30.7]],.22,'Ravi: flows past Lahore; an Eastern river allocated to India under the Indus Waters Treaty 1960.'],
@@ -266,7 +266,7 @@ if(0)L('rivers','Helmand R. (Afghanistan)',64.5,31.5,3,'Helmand: Afghanistan\'s 
 /* UI */
 const NAMES={relief:'Relief colours',rivers:'Rivers',mountains:'Mountains',plateaus:'Plateaus',forests:'Forests',glaciers:'Glaciers',deserts:'Deserts',borders:'Neighbours',loc:'LOC',cities:'Cities'};
 const ch=document.getElementById('chips'),inf=document.getElementById('info');
-const PKS=['sindh','balochistan','kpk','punjab','gb','ajk'];
+const PKS=['sindh','balochistan','kpk','punjab','gb','ajk','iok'];
 let legendVisible=true;
 function sync(){for(const b of ch.querySelectorAll('.c'))if(b.dataset.k)b.classList.toggle('on',!!on[b.dataset.k]);
 const mb=document.getElementById('pv');if(mb)mb.classList.toggle('on',!!on.provinces);
