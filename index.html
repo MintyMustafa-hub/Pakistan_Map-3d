@@ -200,7 +200,7 @@ stroke(BND.prov.gb,0x241c14,.42,BL,.48,false);
 function withoutLocEdges(lines,tol=.16){
  const out=[],cs=Math.cos(34*Math.PI/180);
  function dseg(p,a,b){const px=p[0]*cs,py=p[1],ax=a[0]*cs,ay=a[1],bx=b[0]*cs,by=b[1],dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy||1)));return Math.hypot(px-(ax+t*dx),py-(ay+t*dy))}
- function near(p){return LOC.some((q,i)=>i<LOC.length-1&&dseg(p,q[i],q[i+1])<tol)}
+ function near(p){return LOC.some((_,i)=>i<LOC.length-1&&dseg(p,LOC[i],LOC[i+1])<tol)}
  for(const line of lines){let chain=[];for(let i=0;i<line.length-1;i++){const a=line[i],b=line[i+1],m=[(a[0]+b[0])/2,(a[1]+b[1])/2];if(near(a)||near(m)||near(b)){if(chain.length>1)out.push(chain);chain=[]}else{if(!chain.length)chain.push(a);chain.push(b)}}if(chain.length>1)out.push(chain)}
  return out;
 }
