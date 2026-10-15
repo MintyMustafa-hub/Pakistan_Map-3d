@@ -322,7 +322,7 @@ document.getElementById('rp').onclick=()=>window.open('https://docs.google.com/f
 document.getElementById('resetView').onclick=()=>setView('whole');
 const viewCycle=['north','plains','aerial'];let viewIndex=-1;
 document.getElementById('changeView').onclick=()=>{viewIndex=(viewIndex+1)%viewCycle.length;setView(viewCycle[viewIndex])};
-const FACTS={'PAKISTAN':[['Area','796,096 km²'],['Population','≈ 241.5 million (2023 census)'],['Capital','Islamabad'],['Independence','14 August 1947'],['Coastline','≈ 1,046 km'],['Highest point','K2, 8,611 m']],
+const FACTS={'PAKISTAN':[['Area','796,095 km² (atlas convention)'],['Population','≈ 241.5 million (2023 census)'],['Capital','Islamabad'],['Independence','14 August 1947'],['Coastline','≈ 1,046 km'],['Highest point','K2, 8,611 m']],
 'AFGHANISTAN':[['Type','Landlocked'],['Border with Pakistan','2,640 km (Durand Line, 1893)']],
 'INDIA':[['Border with Pakistan','3,323 km incl. LOC'],['Key lines','Radcliffe Line (1947), LOC (1972)']],
 'CHINA':[['Border with Pakistan','523 km'],['Crossing','Khunjerab Pass, 4,693 m'],['Agreement','Boundary agreement, 1963']],
@@ -353,8 +353,124 @@ const FACTS={'PAKISTAN':[['Area','796,096 km²'],['Population','≈ 241.5 millio
 'Islamabad':[['Status','Federal capital'],['Territory','Islamabad Capital Territory']],
 'Karachi':[['Province','Sindh'],['Role','Largest city and main port']],
 'Lahore':[['Province','Punjab'],['River','Ravi']]};
+
+/* Educational notes enrichment.
+   Facts are deliberately kept separate from rendering and geometry. Values labelled
+   approximate vary between sources or measurement conventions; disputed-area notes
+   retain the project's stated educational perspective and identify it as such. */
+const NOTE_DETAILS={
+'PAKISTAN':{description:'Pakistan lies in South Asia, between the Arabian Sea and the high mountain systems where the Indian, Eurasian and Arabian tectonic plates interact.',significance:'Its relief changes dramatically from the Karakoram and Himalaya in the north to the Indus plain, arid plateaus and the Makran–Sindh coast. The Indus river system is central to settlement and agriculture.'},
+'AFGHANISTAN':{description:'Afghanistan is a landlocked country west and north-west of Pakistan.',significance:'The mountainous frontier includes the Durand Line; historic passes and valleys have linked the region with Central and South Asia.'},
+'INDIA':{description:'India lies east and south-east of Pakistan.',significance:'The international boundary, the Line of Control in Kashmir, and the Indus Waters Treaty are distinct subjects and should not be confused with one another.'},
+'CHINA':{description:'China borders Pakistan in the high Karakoram region.',significance:'The Khunjerab Pass and Karakoram Highway connect northern Pakistan with Xinjiang; the frontier follows difficult high-mountain terrain.'},
+'IRAN':{description:'Iran borders Pakistan to the west, along Balochistan.',significance:'The frontier crosses an arid region with sparse settlement; Taftan is an important road and rail crossing.'},
+'Punjab':{description:'Punjab is Pakistan’s most populous province, centred on the fertile plains of the Indus tributaries.',significance:'The five-river region and extensive irrigation make it a major agricultural and urban region.'},
+'Sindh':{description:'Sindh occupies lower Indus country in south-eastern Pakistan and reaches the Arabian Sea.',significance:'The Indus Delta, irrigated plains, mangroves and the port city of Karachi make it important for farming, trade and coastal ecology.'},
+'Balochistan':{description:'Balochistan is Pakistan’s largest province by area, with rugged ranges, dry basins and a long Makran coast.',significance:'Low rainfall, sparse settlement, mineral resources and the Arabian Sea coast shape its geography.'},
+'Khyber Pakhtunkhwa':{description:'Khyber Pakhtunkhwa includes the Peshawar valley and mountainous terrain extending toward the Hindu Kush.',significance:'Its valleys and passes connect the Indus basin with Afghanistan and the wider Central Asian region.'},
+'Gilgit-Baltistan':{description:'Gilgit-Baltistan lies in northern Pakistan, where the Karakoram, western Himalaya and Hindu Kush systems approach one another.',significance:'The region contains many of the world’s highest peaks and extensive glaciers that feed the Indus system.'},
+'Kashmir':{description:'Kashmir is a disputed Himalayan region whose administration and territorial claims are divided between India and Pakistan, with China also administering parts of the wider former princely state.',significance:'The Line of Control separates Indian-administered and Pakistani-administered areas; it is not generally recognised as an international border. Area figures in this atlas follow the cited AJK government convention and should be read with that source’s definitions.'},
+'K2 8,611 m':{description:'K2, also called Mount Godwin-Austen, is the world’s second-highest mountain and the highest point in the Karakoram.',significance:'Its steep relief, extreme weather and technical climbing routes make it one of the most difficult major peaks to climb.'},
+'Nanga Parbat 8,126 m':{description:'Nanga Parbat is a major Himalayan massif in Gilgit-Baltistan and the world’s ninth-highest mountain.',significance:'Its immense relief above the Indus valley makes it a defining landmark at the western end of the Himalaya.'},
+'Gasherbrum I 8,080 m':{description:'Gasherbrum I, also known as Hidden Peak, is an 8,000-metre mountain in the Karakoram.',significance:'It forms part of the high mountain cluster near the Baltoro Glacier.'},
+'Broad Peak 8,051 m':{description:'Broad Peak is an 8,000-metre mountain in the Karakoram near K2.',significance:'Its long summit ridge gives the mountain its name; it is one of the region’s major high peaks.'},
+'Rakaposhi 7,788 m':{description:'Rakaposhi is a high peak in the Karakoram above the Hunza and Nagar valleys.',significance:'Its steep rise above inhabited valleys makes it one of northern Pakistan’s best-known mountain landmarks.'},
+'Tirich Mir 7,708 m':{description:'Tirich Mir is the highest peak of the Hindu Kush, near Chitral.',significance:'It marks the high mountain environment of north-western Pakistan, distinct from the neighbouring Karakoram and Himalaya.'},
+'Indus':{description:'The Indus rises in the Tibetan Plateau region and flows through or along northern Pakistan before crossing the plains of Punjab and Sindh to the Arabian Sea.',significance:'Its basin supports irrigation, agriculture, cities and major reservoirs. The river’s sediment and freshwater also sustain the Indus Delta.'},
+'Jhelum':{description:'The Jhelum rises in the Kashmir Valley and flows through a series of valleys and reservoirs before joining the Chenab in Punjab.',significance:'It is one of the western rivers of the Indus system and is important to hydropower and irrigation.'},
+'Chenab':{description:'The Chenab forms from the Chandra and Bhaga rivers in the western Himalaya and flows through Indian-administered Jammu and Kashmir into Pakistan’s Punjab.',significance:'It is one of the major tributaries of the Indus system and joins the Sutlej through the Panjnad system.'},
+'Ravi':{description:'The Ravi is one of the five historic rivers of Punjab and flows past Lahore before joining the Chenab.',significance:'It is an eastern river under the Indus Waters Treaty framework; water allocation is a separate legal matter from the river’s physical geography.'},
+'Sutlej':{description:'The Sutlej is the easternmost of the five rivers traditionally associated with Punjab and joins the Chenab system at Panjnad.',significance:'It is part of the wider Indus basin and is central to understanding the historic geography and water agreements of Punjab.'},
+'Beas':{description:'The Beas flows through the Indian state of Himachal Pradesh and joins the Sutlej in India.',significance:'It belongs to the eastern Indus tributary system and is included in the Indus Waters Treaty’s eastern-rivers arrangement.'},
+'Panjnad':{description:'The Panjnad is formed where the Chenab and Sutlej waters meet after the other Punjab tributaries have joined the system.',significance:'It carries the combined flow toward the Indus near Mithankot.'},
+'Kabul R.':{description:'The Kabul River rises in the Hindu Kush region of Afghanistan, passes through eastern Afghanistan and Khyber Pakhtunkhwa, and joins the Indus near Attock.',significance:'Its valley has long been a route between Kabul, the Khyber region and the Indus basin.'},
+'Balochistan Plateau':{description:'The Balochistan Plateau is a dry upland region of western Pakistan made up of basins, mountain ranges and intermontane valleys.',significance:'Its arid climate and rugged relief contrast with the irrigated Indus plains.'},
+'Potohar Plateau':{description:'The Potohar Plateau lies in northern Punjab between the Indus and Jhelum rivers, around Rawalpindi and Islamabad.',significance:'Its dissected terrain, ravines and salt-bearing formations distinguish it from the flatter Punjab plains.'},
+'Deosai Plateau':{description:'Deosai is a high-altitude plateau in Gilgit-Baltistan, often described as one of the world’s highest plateaus.',significance:'Its alpine grasslands and seasonal wetlands form an important protected habitat and watershed.'},
+'Islamabad':{description:'Islamabad is Pakistan’s federal capital, located at the northern edge of the Potohar Plateau near the Margalla Hills.',significance:'Its planned urban layout and location near the foothills distinguish it from the older Indus-plain cities.'},
+'Karachi':{description:'Karachi is Pakistan’s largest city and a major seaport on the Arabian Sea.',significance:'Its harbour, industry and transport links make it a principal centre of national and international trade.'},
+'Lahore':{description:'Lahore is the capital of Punjab, situated near the Ravi River in the north-eastern Punjab plain.',significance:'It is a major cultural, historical, educational and economic centre.'},
+'Khyber Pass':{description:'The Khyber Pass crosses the mountains between the Peshawar valley and Afghanistan near the Torkham crossing.',significance:'It has long served as a strategic corridor for travel, trade and military movement between South and Central Asia.'},
+'Bolan Pass':{description:'The Bolan Pass cuts through the ranges of Balochistan, linking the Sibi area with the Quetta basin.',significance:'It has historically provided an important route between the highlands of Balochistan and the Indus plain.'},
+'Khunjerab Pass':{description:'Khunjerab Pass is a high mountain pass in the Karakoram on the Pakistan–China frontier.',significance:'The Karakoram Highway crosses here, linking Gilgit-Baltistan with Xinjiang.'},
+'Karakoram Range':{description:'The Karakoram is a high mountain range spanning parts of Pakistan, India and China, with a concentration of very high peaks and large glaciers.',significance:'It includes K2 and the Gasherbrum and Broad Peak groups; meltwater from its glaciers contributes to the Indus basin.'},
+'Himalaya':{description:'The Himalaya is a major Asian mountain system formed by the continuing collision of the Indian and Eurasian plates.',significance:'The western Himalaya includes the Nanga Parbat massif and influences climate, river systems and settlement in northern Pakistan.'},
+'Hindu Kush':{description:'The Hindu Kush is a high mountain range extending from Afghanistan into northern Pakistan, including the Chitral region.',significance:'It shapes local climate and drainage and has historically channelled movement through a limited number of valleys and passes.'},
+'Suleiman Range':{description:'The Suleiman Range runs through western Pakistan along the transition between the Balochistan highlands and the Indus plain.',significance:'Its rugged ridges influence travel routes, local drainage and the western edge of the Indus basin.'},
+'Kirthar Range':{description:'The Kirthar Range runs along parts of the Sindh–Balochistan region, separating the lower Indus plain from the western uplands.',significance:'It is an important physical boundary between the arid uplands and the plains of Sindh.'},
+'Makran Coastal Range':{description:'The Makran Coastal Range consists of arid hills and ridges running parallel to parts of the Balochistan coast.',significance:'The landscape reflects active tectonics and uplift near the Makran subduction zone.'},
+'Salt Range':{description:'The Salt Range is a low mountain range in northern Punjab, south of the Potohar Plateau.',significance:'Its salt deposits, including the Khewra salt mine, and its sedimentary geology make it notable.'},
+'Toba Kakar':{description:'The Toba Kakar ranges are rugged highlands in northern Balochistan near the Afghanistan frontier.',significance:'They form part of the mountainous terrain around Quetta and Zhob.'},
+'Siachen Glacier':{description:'Siachen is a large glacier in the eastern Karakoram, in a region affected by the India–Pakistan dispute.',significance:'The glacier is important to high-altitude glaciology and regional water systems; the surrounding area is also the site of a long-running military deployment.'},
+'Baltoro Glacier':{description:'Baltoro is a major Karakoram glacier flowing through the high mountain region near K2 and the Gasherbrum group.',significance:'Its valley provides access to several of the world’s highest peaks and illustrates the scale of non-polar mountain glaciers.'},
+'Biafo–Hispar':{description:'Biafo and Hispar are adjoining glaciers in the Karakoram, connected by the high Hispar La.',significance:'Together they form one of the longest glacier systems outside the polar regions, although published lengths vary by measurement method.'},
+'Batura Glacier':{description:'Batura Glacier lies in the upper Hunza region of Gilgit-Baltistan.',significance:'It is one of the major glaciers on the northern side of the Karakoram and contributes to the Hunza River system.'},
+'Thar Desert':{description:'The Thar is a large arid region shared by south-eastern Pakistan and north-western India; Pakistan’s part lies mainly in Sindh.',significance:'Rainfall is low and variable, but pastoralism, farming where water is available, and distinctive desert ecosystems support local communities.'},
+'Cholistan Desert':{description:'Cholistan is a desert in southern Punjab, near Bahawalpur and the edge of the Thar region.',significance:'It is known for dryland pastoralism, seasonal water storage and historic sites including Derawar Fort.'},
+'Thal Desert':{description:'The Thal is a sandy tract in Punjab between the Indus and Jhelum rivers.',significance:'Its dry conditions contrast with nearby irrigated plains and have shaped settlement and agriculture.'},
+'Kharan Desert':{description:'The Kharan Desert is an arid sandy basin in western Balochistan.',significance:'Its dry climate and sparse population reflect the rain-shadow and continental conditions of the Balochistan interior.'},
+'Chagai–Registan Desert':{description:'The Chagai–Registan area is an arid landscape in western Balochistan near the borders with Afghanistan and Iran.',significance:'The dry basin and surrounding ranges are characteristic of the region’s desert and plateau environments.'},
+'Indus Delta':{description:'The Indus Delta is the low-lying area where the Indus reaches the Arabian Sea, with distributary channels, tidal flats and mangroves.',significance:'It supports coastal fisheries and mangrove habitats but is vulnerable to reduced freshwater and sediment supply, sea-level rise and saltwater intrusion.'},
+'INDUS DELTA':{description:'The Indus Delta is the low-lying area where the Indus reaches the Arabian Sea, with distributary channels, tidal flats and mangroves.',significance:'It supports coastal fisheries and mangrove habitats but is vulnerable to reduced freshwater and sediment supply, sea-level rise and saltwater intrusion.'},
+'Arabian Sea coastline':{description:'Pakistan’s Arabian Sea coastline runs along Sindh and Balochistan, including the Karachi and Gwadar coastal regions.',significance:'Ports, fishing, coastal settlements and the Indus Delta make the coast economically and ecologically important.'},
+'Durand Line':{description:'The Durand Line is the boundary commonly used to describe the Pakistan–Afghanistan frontier, agreed between British India and Afghanistan in 1893.',significance:'It crosses mountainous and tribal regions; its status and interpretation have long been politically contested.'},
+'Durand Line (Afghanistan)':{description:'The Durand Line is the boundary commonly used to describe the Pakistan–Afghanistan frontier, agreed between British India and Afghanistan in 1893.',significance:'It crosses mountainous and tribal regions; its status and interpretation have long been politically contested.'},
+'Radcliffe Line / Wagah':{description:'The Radcliffe Line was the boundary award used to partition British India in Punjab and Bengal in 1947; Wagah is a well-known crossing near Lahore.',significance:'It shaped the international boundary after Partition and caused major population movements.'},
+'Sir Creek':{description:'Sir Creek is a tidal estuary in the marshes of the Rann of Kutch between Sindh and Gujarat.',significance:'The unresolved boundary dispute affects the interpretation of the maritime boundary in the Arabian Sea.'},
+'Taftan':{description:'Taftan is a town and border crossing in western Balochistan on the route to Iran.',significance:'It is an important land route for trade and travel across the Pakistan–Iran frontier.'},
+'Khunjerab (China border)':{description:'The Pakistan–China frontier crosses the high Karakoram; Khunjerab Pass is the principal road crossing.',significance:'The border connects northern Pakistan with Xinjiang through the Karakoram Highway.'},
+'Line of Control (LOC)':{description:'The Line of Control is the military control line dividing Indian-administered and Pakistani-administered parts of the former princely state of Jammu and Kashmir.',significance:'It is a de facto line of control rather than an internationally recognised international boundary; the 1972 Simla Agreement formalised the present line after the 1971 war.'},
+'PAKISTAN–AFGHANISTAN BORDER':{description:'The Pakistan–Afghanistan frontier is commonly associated with the Durand Line.',significance:'The border follows complex mountain terrain and is a major subject in regional history and diplomacy.'},
+'Pakistan–Afghanistan border':{description:'The Pakistan–Afghanistan frontier is commonly associated with the Durand Line.',significance:'The border follows complex mountain terrain and is a major subject in regional history and diplomacy.'},
+'Pakistan–Iran border':{description:'The Pakistan–Iran border runs through the arid landscapes of Balochistan and Iran’s Sistan and Baluchestan region.',significance:'The frontier is important for cross-border travel, trade and regional security.'},
+'Pakistan–China border':{description:'The Pakistan–China border runs through the high Karakoram region.',significance:'The 1963 boundary agreement and the Khunjerab crossing are important parts of its modern geographical context.'},
+'Pakistan–India border':{description:'The Pakistan–India international boundary was shaped by the 1947 Partition; the atlas’s displayed total explicitly includes the Line of Control.',significance:'The international boundary, the Line of Control and the disputed Sir Creek sector are distinct geographical and legal features.'},
+'Pakistan–India border':{description:'The Pakistan–India international boundary was shaped by the 1947 Partition; the atlas’s displayed total explicitly includes the Line of Control.',significance:'The international boundary, the Line of Control and the disputed Sir Creek sector are distinct geographical and legal features.'}
+};
+const WIKI_URLS={
+'PAKISTAN':'Pakistan','AFGHANISTAN':'Afghanistan','INDIA':'India','CHINA':'China','IRAN':'Iran',
+'Punjab':'Punjab, Pakistan','Sindh':'Sindh','Balochistan':'Balochistan, Pakistan','Khyber Pakhtunkhwa':'Khyber Pakhtunkhwa','Gilgit-Baltistan':'Gilgit-Baltistan','Kashmir':'Kashmir',
+'K2 8,611 m':'K2','Nanga Parbat 8,126 m':'Nanga Parbat','Gasherbrum I 8,080 m':'Gasherbrum I','Broad Peak 8,051 m':'Broad Peak','Rakaposhi 7,788 m':'Rakaposhi','Tirich Mir 7,708 m':'Tirich Mir',
+'Indus':'Indus River','Jhelum':'Jhelum River','Chenab':'Chenab River','Ravi':'Ravi River','Sutlej':'Sutlej River','Beas':'Beas River','Panjnad':'Panjnad River','Kabul R.':'Kabul River',
+'Balochistan Plateau':'Balochistan Plateau','Potohar Plateau':'Pothohar Plateau','Deosai Plateau':'Deosai National Park',
+'Islamabad':'Islamabad','Karachi':'Karachi','Lahore':'Lahore','Quetta':'Quetta','Peshawar':'Peshawar','Gilgit':'Gilgit','Muzaffarabad':'Muzaffarabad','Hyderabad':'Hyderabad, Sindh','Multan':'Multan','Faisalabad':'Faisalabad','Gwadar':'Gwadar','Skardu':'Skardu','Sukkur':'Sukkur','Chitral':'Chitral','Kabul':'Kabul','New Delhi':'New Delhi','Kandahar':'Kandahar','Jalalabad':'Jalalabad','Zahedan':'Zahedan',
+'Khyber Pass':'Khyber Pass','Bolan Pass':'Bolan Pass','Khunjerab Pass':'Khunjerab Pass',
+'Karakoram Range':'Karakoram','Himalaya':'Himalayas','Hindu Kush':'Hindu Kush','Suleiman Range':'Sulaiman Mountains','Kirthar Range':'Kirthar Mountains','Makran Coastal Range':'Makran','Salt Range':'Salt Range','Toba Kakar':'Toba Kakar Range','Pir Panjal':'Pir Panjal Range','Ladakh Range':'Ladakh Range','Aravalli Range':'Aravalli Range',
+'Siachen Glacier':'Siachen Glacier','Baltoro Glacier':'Baltoro Glacier','Biafo–Hispar':'Biafo Glacier','Batura Glacier':'Batura Glacier',
+'Thar Desert':'Thar Desert','Cholistan Desert':'Cholistan Desert','Thal Desert':'Thal Desert','Kharan Desert':'Kharan Desert','Chagai–Registan Desert':'Registan Desert',
+'INDUS DELTA':'Indus River Delta','Indus Delta':'Indus River Delta','Arabian Sea coastline':'Coastline of Pakistan',
+'Durand Line':'Durand Line','Durand Line (Afghanistan)':'Durand Line','Radcliffe Line / Wagah':'Radcliffe Line','Sir Creek':'Sir Creek','Taftan':'Taftan','Khunjerab (China border)':'Khunjerab Pass','Line of Control (LOC)':'Line of Control',
+'Pakistan–Afghanistan border':'Afghanistan–Pakistan border','Pakistan–Iran border':'Iran–Pakistan border','Pakistan–China border':'China–Pakistan border','Pakistan–India border':'India–Pakistan border',
+'ARABIAN SEA':'Arabian Sea','PAKISTAN–AFGHANISTAN BORDER':'Afghanistan–Pakistan border'
+};
+function wikiForNote(title,cat){
+ let page=WIKI_URLS[title];
+ if(!page&&title){
+  let base=title.replace(/\s+\d{1,3}(?:,\d{3})?\s*m$/i,'').replace(/\s+\([^)]*\)$/,'').trim();
+  page=WIKI_URLS[base];
+  if(!page&&['cities','provinces','borders','loc','rivers','mountains','glaciers','forests','deserts','plateaus'].includes(cat))page=base;
+ }
+ return page?'https://en.wikipedia.org/wiki/'+encodeURIComponent(page.replace(/ /g,'_')):'';
+}
+function escapeNote(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
 function tgl(w,b,on,off){const e=document.getElementById(w),x=document.getElementById(b);x.onclick=()=>{e.classList.toggle('col');x.textContent=e.classList.contains('col')?off:on;document.body.classList.toggle('tc',document.getElementById('top').classList.contains('col'))}}tgl('top','tb','Hide','Help');tgl('infow','ib','Hide','Notes');
-function show(l){const w=document.getElementById('infow');w.classList.remove('col');document.getElementById('ib').textContent='Hide';const f=FACTS[l.t],n=l.info.replace(/([.;])\s+/g,'$1\n').split('\n').filter(Boolean);inf.innerHTML='<b>'+l.t+'</b>'+(f?'<table>'+f.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>':'')+'<ul>'+n.map(s=>'<li>'+s+'</li>').join('')+'</ul>'+(l.wiki?'<p><a href="'+l.wiki+'" target="_blank" rel="noopener noreferrer">Wikipedia: '+l.t+'</a></p>':'');if(l.measurement)inf.querySelector('b').insertAdjacentHTML('afterend','<table><tr><td>Length (atlas)</td><td>'+l.measurement+'</td></tr></table>');inf.scrollTop=0}
+function show(l){
+ const w=document.getElementById('infow');w.classList.remove('col');document.getElementById('ib').textContent='Hide';
+ const title=l.t,detail=NOTE_DETAILS[title]||{},facts=FACTS[title]||[],wiki=l.wiki||wikiForNote(title,l.cat);
+ const info=String(l.info||'').trim();
+ let html='<b>'+escapeNote(title)+'</b>';
+ const rows=facts.slice();
+ if(l.measurement&&!rows.some(r=>/length/i.test(r[0])))rows.unshift(['Length (atlas)',l.measurement]);
+ if(rows.length)html+='<table>'+rows.map(r=>'<tr><td>'+escapeNote(r[0])+'</td><td>'+escapeNote(r[1])+'</td></tr>').join('')+'</table>';
+ const description=detail.description||info;
+ if(description)html+='<p><b>About:</b> '+escapeNote(description)+'</p>';
+ if(detail.significance)html+='<p><b>Geographical significance:</b> '+escapeNote(detail.significance)+'</p>';
+ if(info&&detail.description&&info!==detail.description)html+='<p><b>Map note:</b> '+escapeNote(info)+'</p>';
+ if(wiki)html+='<p><a href="'+escapeNote(wiki)+'" target="_blank" rel="noopener noreferrer">Read more on Wikipedia ↗</a></p>';
+ else html+='<p><i>A specific Wikipedia article has not yet been matched to this feature.</i></p>';
+ inf.innerHTML=html;inf.scrollTop=0
+}
 const tm=document.getElementById('tm'),rt=document.documentElement,isD=()=>rt.dataset.theme?rt.dataset.theme=='dark':matchMedia('(prefers-color-scheme: dark)').matches;
 function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);tm.innerHTML=isD()?'<span>\u2600</span><span class="lb"> Light</span>':'<span>\u263e</span><span class="lb"> Dark</span>'}
 tm.onclick=()=>{rt.dataset.theme=isD()?'light':'dark';theme()};matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);theme();
