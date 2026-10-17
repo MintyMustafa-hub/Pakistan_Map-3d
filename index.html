@@ -52,6 +52,15 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
   #leg i { width: 8px; height: 8px; margin-right: 5px; vertical-align: -1px; }
   #leg i[style*="height:4px"] { height: 3px !important; vertical-align: 1px; }
 }
+
+/* Desktop fix: move the button bar to the top-right so it no longer covers the instructions panel (top-left). */
+@media (min-width:820px){
+  #quick{left:auto;right:calc(8px + env(safe-area-inset-right,0px));width:max-content;max-width:calc(100vw - 420px);justify-content:flex-end}
+}
+/* Mid-width desktop windows (820-1000px): hide button text labels so the bar stays on one row and clears the Notes panel. */
+@media (min-width:820px) and (max-width:1000px){
+  #quick .lb{display:none}
+}
 </style></head><body>
 <canvas id="cv"></canvas>
 <section class="sr"><h1>Pakistan 3D Topography Map</h1><p>An interactive 3D map of Pakistan for Pakistan Studies students. Rotate, zoom and pan the terrain, and switch layers on or off: mountains and peaks such as K2 and Nanga Parbat, rivers of the Indus system including the Jhelum, Chenab, Ravi, Sutlej and Kabul, the Indus Delta, glaciers such as Siachen and Baltoro, deserts such as Thar, Cholistan and Kharan, plateaus such as the Balochistan, Potohar and Deosai plateaus, forests, provinces and major cities. The map also shows neighbouring Afghanistan, Iran, China and India with border lengths, the Durand Line, the Line of Control, and the Arabian Sea coastline. Tap any label for notes. Boundaries and heights are approximate and intended as a study aid.</p></section><div id="lab"></div>
