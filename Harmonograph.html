@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harmonograph</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#dfe6dc;--panel:#cfd9cc;--ink:#14283a;--brass:#b8742a;--mute:#4b5f6b;--line:#a9b8a8;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#10191f;--panel:#18252d;--ink:#e6efe4;--brass:#e0a050;--mute:#8fa3ad;--line:#2d3f49}}
+:root[data-theme="dark"]{--paper:#10191f;--panel:#18252d;--ink:#e6efe4;--brass:#e0a050;--mute:#8fa3ad;--line:#2d3f49}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.4}
+main{max-width:980px;margin:0 auto;padding:20px 16px 40px;display:grid;gap:18px}
+@media(min-width:820px){main{grid-template-columns:minmax(0,1fr) 340px;align-items:start}header{grid-column:1/-1}}
+h1{font-size:clamp(2rem,6vw,3.4rem);margin:0;letter-spacing:-.03em;line-height:1}
+header p{margin:8px 0 0;color:var(--mute);max-width:52ch}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px}
+canvas{width:100%;aspect-ratio:1/1;display:block;border-radius:2px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:700;background:var(--ink);color:var(--paper);border:0;border-radius:4px;padding:9px 14px;cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+aside{display:grid;gap:14px}
+fieldset{border:1px solid var(--line);border-radius:6px;margin:0;padding:10px 12px 12px}
+legend{font-weight:700;padding:0 6px}
+label{display:grid;grid-template-columns:78px 1fr 44px;align-items:center;gap:8px;font-size:.9rem;color:var(--mute)}
+label output{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--brass)}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.presets button{padding:7px 11px;font-weight:400}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Harmonograph</h1>
+<p>Four swinging pendulums, two steering the pen left and right, two steering it up and down. Adjust any swing and watch the pen redraw the drawing.</p>
+</header>
+<section>
+<div class="stage"><canvas id="c" aria-label="Harmonograph drawing"></canvas>
+<div class="bar"><button id="replay">Redraw</button><button id="rand" class="alt">Surprise me</button><button id="skip" class="alt">Finish drawing</button></div></div>
+</section>
+<aside>
+<fieldset><legend>Presets</legend><div class="presets" id="presets"></div></fieldset>
+<fieldset><legend>Side-to-side pendulums</legend><div id="gx"></div></fieldset>
+<fieldset><legend>Up-and-down pendulums</legend><div id="gy"></div></fieldset>
+<fieldset><legend>Pen</legend><div id="gp"></div></fieldset>
+</aside>
+</main>
+<script>
+(function(){
+var P={f:[2,3,3,2.01],p:[0,1.57,0,.5],d:.035,sp:1};
+var presets={
+ "Knot":{f:[2,3,3,2.01],p:[0,1.57,0,.5],d:.035},
+ "Moth":{f:[3,2,2,3.005],p:[0,0,1.57,3.1],d:.03},
+ "Rose":{f:[4,4.02,3,3.02],p:[0,1.57,1.57,0],d:.045},
+ "Slow spiral":{f:[1,1.5,1.5,1.01],p:[1.57,0,0,1.57],d:.02},
+ "Lace":{f:[5,3,3,5.01],p:[0,.8,2.4,0],d:.05}
+};
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var N=36000,T=60,i=0,raf=0,W=0;
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;W=Math.max(200,Math.round(r.width));cv.width=W*d;cv.height=W*d;ctx.setTransform(d,0,0,d,0,0);restart()}
+function pt(k){var t=k/N*T,e=Math.exp(-P.d*t),s=2*Math.PI;
+ return [.5*(Math.sin(s*P.f[0]*t+P.p[0])+Math.sin(s*P.f[1]*t+P.p[1]))*e,
+         .5*(Math.sin(s*P.f[2]*t+P.p[2])+Math.sin(s*P.f[3]*t+P.p[3]))*e]}
+function mix(a,b,t){var A=parse(a),B=parse(b);return 'rgb('+A.map(function(v,j){return Math.round(v+(B[j]-v)*t)}).join(',')+')'}
+function parse(h){h=h.replace('#','');return [0,2,4].map(function(j){return parseInt(h.substr(j,2),16)})}
+var c1,c2;
+function restart(){cancelAnimationFrame(raf);i=0;c1=css('--ink');c2=css('--brass');
+ ctx.fillStyle=css('--panel');ctx.fillRect(0,0,W,W);draw()}
+function seg(n){var h=W/2,s=W*.46,prev=pt(i),k=0;
+ ctx.lineWidth=Math.max(.7,W/700);ctx.lineCap='round';
+ while(k<n&&i<N){var a=i;ctx.beginPath();ctx.strokeStyle=mix(c1,c2,Math.pow(i/N,.6));
+  ctx.moveTo(h+prev[0]*s,h+prev[1]*s);
+  for(var j=0;j<120&&i<N;j++,i++,k++){prev=pt(i+1);ctx.lineTo(h+prev[0]*s,h+prev[1]*s)}
+  ctx.stroke()}}
+function draw(){seg(Math.round(500*P.sp));if(i<N)raf=requestAnimationFrame(draw)}
+function row(parent,key,idx,label,min,max,step){
+ var l=document.createElement('label'),v=idx==null?P[key]:P[key][idx];
+ l.innerHTML='<span>'+label+'</span><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+v+'"><output>'+(+v).toFixed(2)+'</output>';
+ var inp=l.querySelector('input'),out=l.querySelector('output');
+ inp.addEventListener('input',function(){var x=+inp.value;if(idx==null)P[key]=x;else P[key][idx]=x;out.textContent=x.toFixed(2);if(key=='sp'){return}restart()});
+ l._set=function(){var x=idx==null?P[key]:P[key][idx];inp.value=x;out.textContent=(+x).toFixed(2)};
+ parent.appendChild(l);rows.push(l)}
+var rows=[];
+var gx=document.getElementById('gx'),gy=document.getElementById('gy'),gp=document.getElementById('gp');
+row(gx,'f',0,'Speed A',.5,6,.01);row(gx,'f',1,'Speed B',.5,6,.01);row(gx,'p',0,'Offset A',0,6.28,.01);row(gx,'p',1,'Offset B',0,6.28,.01);
+row(gy,'f',2,'Speed C',.5,6,.01);row(gy,'f',3,'Speed D',.5,6,.01);row(gy,'p',2,'Offset C',0,6.28,.01);row(gy,'p',3,'Offset D',0,6.28,.01);
+row(gp,'d',null,'Fade-out',.005,.15,.005);row(gp,'sp',null,'Draw speed',.3,4,.1);
+function sync(){rows.forEach(function(r){r._set()})}
+function apply(o){P.f=o.f.slice();P.p=o.p.slice();P.d=o.d;sync();restart()}
+var pb=document.getElementById('presets');
+Object.keys(presets).forEach(function(n){var b=document.createElement('button');b.textContent=n;b.className='alt';b.onclick=function(){apply(presets[n])};pb.appendChild(b)});
+function rnd(a,b){return a+Math.random()*(b-a)}
+document.getElementById('rand').onclick=function(){
+ var b1=Math.round(rnd(1,5)),b2=Math.round(rnd(1,5));
+ apply({f:[b1,b1+rnd(-.01,.01)+(Math.random()<.5?0:Math.round(rnd(1,2))),b2,b2+rnd(-.02,.02)+(Math.random()<.5?0:1)].map(function(v){return Math.min(6,Math.max(.5,v))}),
+  p:[rnd(0,6.28),rnd(0,6.28),rnd(0,6.28),rnd(0,6.28)],d:rnd(.02,.07)})};
+document.getElementById('replay').onclick=restart;
+document.getElementById('skip').onclick=function(){cancelAnimationFrame(raf);seg(N-i)};
+window.addEventListener('resize',function(){clearTimeout(size._t);size._t=setTimeout(size,150)});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',restart);
+size();
+})();
+</script>
+</body>
+</html>
