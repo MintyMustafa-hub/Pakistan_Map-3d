@@ -749,9 +749,10 @@ theme();
 /* layers */
 const ch=document.getElementById('chips');
 function sync(){
-  gLand.style.display = on.countries ? '' : 'none';
-  gBorders.style.display = on.countries ? '' : 'none';
-  gProv.style.display = on.provinces ? '' : 'none';
+  // Country and province colours/outlines always stay visible; the Countries and Provinces buttons only toggle their labels (see labelOn).
+  gLand.style.display = '';
+  gBorders.style.display = '';
+  gProv.style.display = '';
   gIok.style.display = '';
   gLoc.style.display = on.loc ? '' : 'none';
   // One flag drives every route graphic (CPEC, maritime, Quetta-Taftan) plus their arrows and route labels. Elements stay in the DOM.
@@ -769,6 +770,7 @@ function sync(){
 }
 function btn(t,k,fn,title){const b=document.createElement('button');b.type='button';b.className='c';b.textContent=t;if(k)b.dataset.k=k;if(title)b.title=title;b.onclick=fn;ch.appendChild(b);return b;}
 btn('Show all',0,()=>{for(const k in on)on[k]=1;sync();});
+btn('Hide all',0,()=>{for(const k in on)if(k!=='countries'&&k!=='provinces')on[k]=0;sync();});
 const routeBtn=btn('Hide routes',0,()=>{on.routes=on.routes?0:1;sync();},'Show or hide all routes: CPEC, sea routes and the Quetta–Taftan land route');
 const legBtn=btn('Legend',0,()=>{const leg=document.getElementById('leg');const vis=leg.style.display!=='none';leg.style.display=vis?'none':'block';legBtn.classList.toggle('on',!vis);},'Show or hide the legend');
 legBtn.classList.add('on');legBtn.id='legendBtn';
