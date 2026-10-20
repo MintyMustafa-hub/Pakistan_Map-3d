@@ -67,7 +67,7 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 #cv{background:var(--sea);z-index:0}
 #svg{width:100%;height:100%;display:block;touch-action:none}
 #lab{z-index:1}
-.l{pointer-events:none}
+.l{pointer-events:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;outline:none}
 .l.big{font-size:15px}
 .l.sea{pointer-events:none}
 .l.port{font-size:11px}
@@ -76,6 +76,9 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 .l.city::before,.l.stop::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:4px;vertical-align:1px;box-shadow:0 0 0 1px var(--port-ring)}
 button,.c,.tg{cursor:pointer}
 #svg path.hit{cursor:pointer}
+#svg,#svg *{-webkit-tap-highlight-color:transparent;outline:none}
+#svg *:focus{outline:none}
+#lab,#lab *{-webkit-tap-highlight-color:transparent}
 :root{
   --sea:#c3dceb;--land:#d9d3c6;--pk:#e4d7b0;--india:#e6d3c2;--china:#d5dbe3;--russia:#d4d8e4;
   --iran:#e3d5c4;--afg:#ddd6c6;--casia:#d5ddd4;--line:#2a3330;--line-soft:#5c675f;
@@ -740,7 +743,7 @@ function sync(){
   gLand.style.display = on.countries ? '' : 'none';
   gBorders.style.display = on.countries ? '' : 'none';
   gProv.style.display = on.provinces ? '' : 'none';
-  gIok.style.display = on.loc ? '' : 'none';
+  gIok.style.display = '';
   gLoc.style.display = on.loc ? '' : 'none';
   // One flag drives every route graphic (CPEC, maritime, Quetta-Taftan) plus their arrows and route labels. Elements stay in the DOM.
   gCpec.style.display = on.routes ? '' : 'none';
