@@ -109,6 +109,14 @@ button,.c,.tg{cursor:pointer}
 #info .topic{display:inline-block;margin:3px 4px 0 0;border:1px solid var(--bd);background:transparent;color:var(--tx);border-radius:14px;padding:4px 8px;font:inherit;cursor:pointer}
 #info .topic:hover{border-color:var(--ac);color:var(--ac)}
 
+/* Hamburger menu (added): sits at the end of the top-right button bar, reuses the .c chip look. */
+#navMenu{position:relative;margin-left:auto;flex:none}
+#navBtn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:34px;padding:5px 10px;background:var(--pn);cursor:pointer;touch-action:manipulation}
+#navBtn svg{width:18px;height:18px;display:block;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;fill:none;pointer-events:none}
+#navDrop{position:absolute;top:calc(100% + 6px);right:0;min-width:170px;background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:10}
+#navDrop[hidden]{display:none}
+#navDrop a{display:block;padding:10px 12px;border-radius:8px;color:var(--tx);text-decoration:none;font:inherit;font-weight:600;white-space:nowrap;min-height:20px}
+#navDrop a:hover,#navDrop a:focus-visible{background:var(--ac);color:#fff;outline:none}
 </style>
 </head>
 <body>
@@ -124,6 +132,7 @@ button,.c,.tg{cursor:pointer}
 <button class="c" id="resetView" type="button">Reset view</button>
 <button class="c" id="changeView" type="button">Change view</button>
 <button class="c" id="tm" type="button"></button>
+<div id="navMenu"><button type="button" class="c" id="navBtn" aria-label="Open navigation menu" aria-haspopup="true" aria-expanded="false" aria-controls="navDrop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div id="navDrop" hidden><a href="https://mintymustafa-hub.github.io/Pakistan_Map-3d/" id="navHome">Back to Pakistan Map</a></div></div>
 </div>
 <div class="ui" id="infow"><div class="hd"><b>Notes</b><button class="tg" id="ib" type="button">Hide</button></div>
 <div id="info"></div></div>
@@ -792,6 +801,18 @@ document.getElementById('changeView').onclick=()=>{viewIndex=(viewIndex+1)%cycle
 
 setView('region');
 sync();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('navBtn'),drop=document.getElementById('navDrop');
+  if(!btn||!drop)return;
+  function setOpen(o){drop.hidden=!o;btn.setAttribute('aria-expanded',o?'true':'false');btn.setAttribute('aria-label',o?'Close navigation menu':'Open navigation menu')}
+  btn.addEventListener('click',function(e){e.stopPropagation();setOpen(drop.hidden)});
+  drop.addEventListener('click',function(e){if(e.target.closest('a'))setOpen(false)});
+  /* capture phase so it still fires even if the map handles the pointer event itself */
+  document.addEventListener('pointerdown',function(e){if(!drop.hidden&&!e.target.closest('#navMenu'))setOpen(false)},true);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!drop.hidden){setOpen(false);btn.focus()}});
+})();
 </script>
 </body>
 </html>
