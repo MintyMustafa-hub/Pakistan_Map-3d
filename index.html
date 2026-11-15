@@ -1,28 +1,4 @@
-<!DOCTYPE html><html lang="en">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Website Title -->
-  <title>Pakistan 3D Atlas</title>
-
-  <!-- Browser Tab Logo (Favicon) -->
-  <link rel="icon" type="image/jpeg" href="/image/logo.jpg">
-  <link rel="apple-touch-icon" href="/image/logo.jpg">
-
-  <!-- Social Media Preview -->
-  <meta property="og:title" content="Pakistan 3D Atlas">
-  <meta property="og:description" content="Explore Pakistan's geography through an interactive 3D topographic atlas.">
-  <meta property="og:image" content="https://pakistan3datlas.com/image/logo.jpg">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://pakistan3datlas.com/">
-
-  <!-- Twitter/X Preview -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Pakistan 3D Atlas">
-  <meta name="twitter:description" content="Explore Pakistan's geography through an interactive 3D topographic atlas.">
-  <meta name="twitter:image" content="https://pakistan3datlas.com/image/logo.jpg">
-  <meta charset="utf-8">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pakistan 3D Topography Map – Interactive Relief Atlas for Pakistan Studies</title>
 <meta name="description" content="Free interactive 3D map of Pakistan: mountains, rivers, glaciers, deserts, plateaus, forests, borders and the LOC. Made for Pakistan Studies students.">
@@ -35,14 +11,14 @@
 :root{--bg:#dbe7ee;--pn:rgba(255,255,255,.93);--tx:#1d2a2f;--bd:#0e7c66;--ac:#0e7c66;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1e2b;--pn:rgba(18,28,32,.93);--tx:#e6eeee;--bd:#34454a;--ac:#3ec9a7}}
 :root[data-theme="dark"]{--bg:#0b1e2b;--pn:rgba(18,28,32,.93);--tx:#e6eeee;--bd:#34454a;--ac:#3ec9a7}
-html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--tx);font:13px system-ui,sans-serif}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--tx);font:13px system-ui,sans-serif}
 #cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:block}
 #lab{position:fixed;inset:0;pointer-events:none;overflow:hidden}
 .l{position:absolute;left:0;top:0;white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,0 0 5px #000;display:none}
 .l.big{font-size:15px;letter-spacing:2px;font-weight:700}.l.big{ text-shadow:0 0 3px #000,0 0 4px #000,0 0 6px #000 }.l.sea{color:#9fd8ff;font-style:italic;letter-spacing:3px;font-size:13px}
 .ui{position:fixed;left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:7px 10px}
 #top{top:calc(62px + env(safe-area-inset-top,0px));font-weight:700}
-#top small{font-weight:400;opacity:.75;display:block}
+#top small{font-weight:400;opacity:.75;display:block}.ht{display:none}@media(pointer:coarse){.hm{display:none}.ht{display:inline}}
 #quick{position:fixed;left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));top:calc(8px + env(safe-area-inset-top,0px));display:flex;flex-wrap:wrap;gap:6px;align-items:center;z-index:4}#quick .c{padding:5px 10px;background:var(--pn);white-space:nowrap}
 #infow{bottom:calc(58px + env(safe-area-inset-bottom,0px));line-height:1.35;height:auto;min-height:0;max-height:min(32dvh,260px);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}#infow .hd{flex:0 0 auto}#info{flex:0 1 auto;height:auto;min-height:0;max-height:calc(32dvh - 52px);overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;pointer-events:auto;position:relative}
 .hd{display:flex;justify-content:space-between;align-items:center;gap:10px}.tg{border:1px solid var(--bd);background:transparent;color:var(--tx);border-radius:12px;padding:3px 10px;font:inherit;font-weight:400}
@@ -98,7 +74,7 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 </style></head><body>
 <canvas id="cv"></canvas>
 <section class="sr"><h1>Pakistan 3D Topography Map</h1><p>An interactive 3D map of Pakistan for Pakistan Studies students. Rotate, zoom and pan the terrain, and switch layers on or off: mountains and peaks such as K2 and Nanga Parbat, rivers of the Indus system including the Jhelum, Chenab, Ravi, Sutlej and Kabul, the Indus Delta, glaciers such as Siachen and Baltoro, deserts such as Thar, Cholistan and Kharan, plateaus such as the Balochistan, Potohar and Deosai plateaus, forests, provinces and major cities. The map also shows neighbouring Afghanistan, Iran, China and India with border lengths, the Durand Line, the Line of Control, and the Arabian Sea coastline. Tap any label for notes. Boundaries and heights are approximate and intended as a study aid.</p></section><div id="lab"></div>
-<div class="ui" id="top"><div class="hd"><span class="ttl">Pakistan 3D Topography Atlas</span><button class="tg" id="tb">Hide</button></div><small>Drag: rotate · Pinch/scroll: zoom · Two fingers/right-drag: pan · Tap a label for notes · Zoom in for more labels</small></div><div id="quick"><button class="c" id="rp" title="Report a mistake"><span>⚑ Report</span><span class="lb"> a mistake</span></button><button class="c" id="resetView">Reset view</button><button class="c" id="changeView">Change view</button><button class="c" id="tm"></button><div id="navMenu"><button type="button" class="c" id="navBtn" aria-label="Open navigation menu" aria-haspopup="true" aria-expanded="false" aria-controls="navDrop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div id="navDrop" hidden><a href="https://mintymustafa-hub.github.io/Pakistan_Map-3d/traderoutes.html" id="navTrade">Visit Trade Routes</a><a href="https://www.chailink.co/mintymustafa" id="navChai" class="chai" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V9z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2M11 3.5v2"/></svg>Buy me a chai</a></div></div></div>
+<div class="ui" id="top"><div class="hd"><span class="ttl">Pakistan 3D Topography Atlas</span><button class="tg" id="tb">Hide</button></div><small><span class="hm">Scroll, pinch or + / −: zoom · Drag, Ctrl + move or Ctrl + scroll: pan · Add Shift to rotate</span><span class="ht">Drag: rotate · Two fingers: pan · Pinch: zoom</span> · Tap a label for notes · Zoom in for more labels</small></div><div id="quick"><button class="c" id="rp" title="Report a mistake"><span>⚑ Report</span><span class="lb"> a mistake</span></button><button class="c" id="resetView">Reset view</button><button class="c" id="changeView">Change view</button><button class="c" id="tm"></button><div id="navMenu"><button type="button" class="c" id="navBtn" aria-label="Open navigation menu" aria-haspopup="true" aria-expanded="false" aria-controls="navDrop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div id="navDrop" hidden><a href="https://mintymustafa-hub.github.io/Pakistan_Map-3d/atlas.html" id="navTrade">Visit Trade Routes</a><a href="https://www.chailink.co/mintymustafa" id="navChai" class="chai" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V9z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2M11 3.5v2"/></svg>Buy me a chai</a></div></div></div>
 <div class="ui" id="infow"><div class="hd"><b>Notes</b><button class="tg" id="ib">Hide</button></div><div id="info"><b>Pakistan Studies map.</b> Heights are exaggerated; boundaries and features are approximate (study aid, not a survey map).</div></div>
 <div id="bar"><div class="ui" id="chips"></div></div><div class="ui" id="leg"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -123,7 +99,7 @@ const BND={"iran":[[[61.6125,25.2005],[61.5882,25.2021],[61.62,25.2855],[61.6432
 const IOK=[[75.32233,32.33733],[75.19547,32.40531],[75.18853,32.42448],[75.13945,32.41461],[75.08263,32.48005],[75.03664,32.49207],[74.97935,32.44777],[74.83533,32.49621],[74.69842,32.48494],[74.64221,32.61105],[74.67621,32.658],[74.65014,32.71841],[74.69702,32.83971],[74.65235,32.84101],[74.62096,32.76496],[74.52042,32.75838],[74.45999,32.79567],[74.41389,32.90395],[74.31803,32.9197],[74.35318,32.98313],[74.34983,33.01625],[74.25497,33.04877],[74.20525,33.0433],[74.17625,33.10715],[74.1117,33.16444],[74.01427,33.19825],[74.0203,33.25878],[74.10298,33.27054],[74.17075,33.34665],[74.18707,33.45552],[74.09571,33.5704],[74.02844,33.57468],[73.95625,33.72029],[74.06573,33.8201],[74.14334,33.83014],[74.21967,33.86718],[74.26112,33.9248],[74.26274,33.97429],[74.24869,34.01382],[74.21468,34.03856],[74.1237,34.05518],[74.00607,34.02244],[73.89817,34.03282],[73.88322,34.04995],[73.90408,34.12225],[73.97658,34.2118],[73.97623,34.26481],[73.89941,34.35981],[73.84175,34.33832],[73.80739,34.35672],[73.77339,34.34975],[73.76432,34.37107],[73.77698,34.4163],[73.89874,34.49577],[73.89534,34.54667],[73.94807,34.57309],[73.92733,34.64589],[73.96022,34.69668],[74.01289,34.70985],[74.04913,34.68496],[74.14179,34.6912],[74.3073,34.8003],[74.34126,34.78969],[74.37554,34.80344],[74.58018,34.7701],[74.703,34.69308],[74.91051,34.68321],[75.01875,34.6415],[75.1423,34.66241],[75.24971,34.64731],[75.26606,34.63955],[75.26185,34.61088],[75.37782,34.55242],[75.74921,34.51583],[75.94625,34.63118],[75.99185,34.62997],[76.03646,34.67027],[76.07444,34.67631],[76.15791,34.64341],[76.26005,34.68437],[76.31614,34.73163],[76.38593,34.73595],[76.47434,34.79437],[76.56181,34.75834],[76.68182,34.75959],[76.74324,34.8401],[76.74937,34.9266],[76.81105,34.93545],[76.87004,34.97243],[76.99749,34.93915],[77.0181,35.03846],[77.06837,35.02412],[77.15682,35.0547],[77.65057,35.36708],[77.82393,35.50133],[77.88334,35.4803],[77.91369,35.50443],[77.95037,35.48457],[77.91432,35.53792],[77.9547,35.59848],[77.93595,35.61867],[77.98353,35.59416],[78.01381,35.60425],[78.10465,35.55378],[78.13349,35.57109],[78.14502,35.64462],[78.16953,35.65039],[78.17052,35.68198],[78.2273,35.65927],[78.24757,35.7428],[78.34734,35.74686],[78.40086,35.80445],[78.499,35.78985],[78.63444,35.88253],[78.68491,35.89262],[78.75844,35.87821],[78.91416,35.91569],[78.95598,35.87821],[79.07854,35.86379],[79.13477,35.90848],[79.13765,35.98779],[79.18235,36.01518],[79.32077,36.02816],[79.35682,35.92723],[79.63077,35.8609],[79.68845,35.82846],[79.79226,35.82269],[79.8557,35.86691],[79.92684,35.86883],[80.02681,35.71696],[80.19214,35.66313],[80.21906,35.62852],[80.24405,35.51702],[80.20283,35.47286],[80.20067,35.39716],[80.112,35.1798],[80.12293,35.08133],[80.07487,34.9506],[80.0071,34.83531],[80.01683,34.75961],[80.00386,34.7315],[79.90653,34.70554],[79.80812,34.70771],[79.73134,34.65039],[79.73459,34.61146],[79.7108,34.57469],[79.76811,34.53793],[79.72377,34.49467],[79.54859,34.51197],[79.46856,34.48818],[79.48803,34.42979],[79.51831,34.42222],[79.50965,34.39951],[79.54859,34.2546],[79.47073,34.2135],[79.44477,34.12591],[79.38962,34.09671],[79.38097,34.06535],[79.40043,34.04373],[79.38746,34.02426],[79.16739,34.05684],[79.13089,34.07874],[79.10251,34.02926],[79.05222,34.02358],[78.98085,34.05278],[78.92894,34.03494],[78.88271,33.98546],[78.98977,33.78757],[79.04087,33.7681],[78.99775,33.70891],[79.01796,33.68446],[79.05647,33.68499],[79.08294,33.61694],[78.89355,33.63153],[78.92226,33.50287],[78.90631,33.45077],[78.93821,33.37315],[78.97223,33.33487],[79.08069,33.2934],[79.22424,33.29659],[79.42946,33.26575],[79.41989,33.19983],[79.35715,33.09775],[79.37736,33.04884],[79.32419,33.00737],[79.41809,32.95091],[79.52918,32.81022],[79.60335,32.76715],[79.61212,32.74083],[79.4271,32.52631],[79.39441,32.52791],[79.37766,32.57336],[79.30908,32.59171],[79.26681,32.5311],[79.12653,32.46431],[79.10447,32.37171],[79.0597,32.38557],[78.97096,32.34428],[78.91467,32.36709],[78.78118,32.4753],[78.76806,32.66298],[78.73645,32.69593],[78.65443,32.64923],[78.62567,32.60705],[78.54493,32.61231],[78.48561,32.57322],[78.45272,32.5795],[78.41224,32.55606],[78.41653,32.5151],[78.38243,32.52965],[78.31041,32.47593],[78.27852,32.50793],[78.29917,32.52927],[78.29662,32.57751],[78.38882,32.62323],[78.36315,32.67199],[78.37135,32.76183],[78.28766,32.73783],[78.29572,32.71281],[78.20164,32.6652],[78.15254,32.67902],[78.1215,32.64235],[78.08852,32.65983],[78.06533,32.62428],[78.02479,32.64302],[78.00669,32.62168],[77.97839,32.62632],[77.90325,32.6931],[77.91513,32.76606],[77.8809,32.77541],[77.8476,32.82841],[77.76772,32.85847],[77.79017,32.90543],[77.67086,32.98627],[77.65331,32.9594],[77.58392,32.9438],[77.51956,32.88738],[77.48455,32.88654],[77.45522,32.86174],[77.38747,32.88552],[77.35968,32.85958],[77.35648,32.82527],[77.3279,32.81988],[77.30516,32.85405],[77.25832,32.87636],[77.23888,32.86516],[77.22826,32.89557],[77.17386,32.93113],[77.14619,32.91402],[77.13639,32.98046],[77.0749,32.97335],[77.03532,32.99968],[76.99847,32.98957],[76.91751,33.03368],[76.8772,33.11424],[76.84444,33.1123],[76.80346,33.15569],[76.82835,33.2464],[76.80276,33.23666],[76.77827,33.25571],[76.75534,33.24949],[76.75988,33.22467],[76.72987,33.17943],[76.62701,33.16248],[76.5819,33.20687],[76.54748,33.20953],[76.46906,33.17991],[76.39168,33.18669],[76.275,33.10399],[76.23729,33.03259],[76.09369,33.00483],[76.08221,32.9688],[75.94577,32.88514],[75.86712,32.93021],[75.80795,32.92979],[75.78983,32.8814],[75.87379,32.81369],[75.91248,32.75712],[75.89658,32.69106],[75.92544,32.65427],[75.82504,32.50922],[75.79015,32.47879],[75.74593,32.47635],[75.68496,32.40062],[75.54515,32.36082],[75.50124,32.27605],[75.49023,32.31021],[75.46776,32.31756],[75.47224,32.34005],[75.41499,32.32427],[75.32233,32.33733]];
 function inIok(lo,la){return inRing(lo,la,IOK)}
 // Administrative region IDs are precomputed against the embedded geoBoundaries polygons.
-const REGION_COLORS={1:[0.70,0.81,0.64],2:[0.82,0.77,0.68],3:[0.98,0.87,0.66],4:[0.79,0.89,0.83],5:[0.98,0.87,0.65],6:[0.82,0.77,0.68],7:[0.88,0.82,0.72],8:[0.82,0.77,0.68]};
+const REGION_COLORS={1:[0.773,0.843,0.643],2:[0.878,0.816,0.706],3:[0.953,0.886,0.69],4:[0.788,0.894,0.839],5:[0.835,0.859,0.902],6:[0.902,0.827,0.753],7:[0.937,0.878,0.761],8:[0.894,0.816,0.784]};
 function inRing(lo,la,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];if(((yi>la)!==(yj>la))&&(lo<(xj-xi)*(la-yi)/(yj-yi+1e-30)+xi))inside=!inside;}return inside}
 function regionAt(lo,la){const order=[['sindh',1],['balochistan',2],['punjab',3],['kpk',4],['gb',5],['ajk',6],['iok',8],['ict',7]];for(const [key,id] of order){const rings=key==='iok'?[IOK]:(BND.prov[key]||[]);for(const ring of rings)if(ring.length>2&&inRing(lo,la,ring))return id;}return 0}
 function maskAt(lo,la){if(inIok(lo,la))return 1;let fx=(lo-LON0)/(LON1-LON0)*NX,fy=(LAT1-la)/(LAT1-LAT0)*NZ;fx=Math.min(NX,Math.max(0,fx));fy=Math.min(NZ,Math.max(0,fy));return MSK[(fy+.5|0)*(NX+1)+(fx+.5|0)]}
@@ -147,7 +123,7 @@ function HY0(lo,la){if(inIok(lo,la))return Math.max(.12,hk(lo,la)*.8);const m=ma
 /* Indus gorge. The terrain is a smooth blob model with no river valleys, so a river draped on it climbs over Nanga Parbat (~7 km in the model) and the Kohistan ridges although the real Indus there lies at about 1-2 km. Fix: carve a narrow valley into the terrain along the Indus from Leh to Attock. The river bed is the running minimum of the raw terrain going downstream (it can only stay level or fall), and the terrain is only ever lowered, never raised, so the river sits on the valley floor: not floating, not cut through. Nothing outside the corridor changes. */
 const INDUS_RAW=[[80.1,31.6],[79.8,31.9],[79.5,32.2],[79.1,32.55],[78.8,32.9],[78.4,33.25],[78.0,33.65],[77.75,34.0],[77.58,34.15],[77.35,34.35],[76.95,34.55],[76.55,34.8],[76.1,35.05],[75.7,35.3],[75.2,35.48],[74.95,35.62],[74.65,35.72],[74.62,35.55],[74.6,35.4],[74.4,35.38],[74.1,35.42],[73.7,35.4],[73.3,35.3],[73.05,35.12],[72.88,34.93],[72.85,34.62],[72.72,34.3],[72.69,34.09],[72.5,33.98],[72.25,33.9],[72.05,33.55],[71.8,33.2],[71.65,32.85],[71.6,32.5],[71.25,32.15],[70.95,31.8],[70.8,30.7],[70.68,30.2],[70.55,29.6],[70.47,29.2],[70.45,28.95],[70.28,28.78],[70.0,28.58],[69.7,28.4],[69.35,28.1],[68.9,27.7],[68.55,26.75],[68.4,25.4],[68.1,24.9],[67.7,24.5]];
 /* River styling and path refinement (single source of truth). RIVER_COL matches the pale teal-blue of the CIA physiography map's rivers, lightened; RIVER_W thins the tube and its outline together. */
-const RIVER_COL=0x6fb8d8,RIVER_HEX='#6fb8d8',RIVER_W=.6;
+const RIVER_COL=0x5f93a8,RIVER_HEX='#5f93a8',RIVER_W=.6;
 const _sm=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x)},_hs=(a,b)=>{const h=Math.sin(a*127.1+b*311.7)*43758.5453;return h-Math.floor(h)};
 function refineRiver(p,mea=1){const q=[];for(let i=0;i<p.length-1;i++){const a=p[i],b=p[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);q.push(a);if(L>.22&&mea>0){const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],low=(1-_sm(33.2,34.3,mid[1]))*(1-_sm(75.5,76.5,mid[0])),amp=Math.min(.09,L*.13)*low*mea,nx=-dy/L,ny=dx/L,k=L>.7?3:2;for(let j=1;j<=k;j++){const t=j/(k+1),o=((_hs(a[0]+j,a[1])-.5)*2)*amp*Math.sqrt(Math.sin(Math.PI*t));q.push([a[0]+dx*t+nx*o,a[1]+dy*t+ny*o])}}}q.push(p[p.length-1]);
 const o=[],P=i=>q[Math.min(q.length-1,Math.max(0,i))];for(let i=0;i<q.length-1;i++){const p0=P(i-1),p1=P(i),p2=P(i+1),p3=P(i+2),n=Math.max(2,Math.ceil(Math.hypot(p2[0]-p1[0],p2[1]-p1[1])/.07));for(let k=0;k<n;k++){const t=k/n,t2=t*t,t3=t2*t,f=(c0,c1,c2,c3)=>.5*(2*c1+(-c0+c2)*t+(2*c0-5*c1+4*c2-c3)*t2+(-c0+3*c1-3*c2+c3)*t3);o.push([f(p0[0],p1[0],p2[0],p3[0]),f(p0[1],p1[1],p2[1],p3[1])])}}o.push(q[q.length-1]);return o}
@@ -190,9 +166,21 @@ const RAMP=[[0,[.62,.72,.42]],[.3,[.72,.68,.42]],[1.2,[.62,.52,.36]],[3,[.5,.43,
 function ramp(e){for(let i=0;i<RAMP.length-1;i++){const a=RAMP[i],b=RAMP[i+1];if(e<=b[0]){const t=Math.max(0,(e-a[0])/(b[0]-a[0]));return a[1].map((v,k)=>v+(b[1][k]-v)*t)}}return RAMP[5][1]}
 const mix=(a,b,t)=>a.map((v,k)=>v+(b[k]-v)*t);
 const on={relief:1,rivers:1,mountains:1,plateaus:1,forests:1,glaciers:1,deserts:1,borders:1,loc:1,cities:1,provinces:1};
-const BC=[[.2,.5,.72],[.96,.98,1],[.08,.38,.17],[.15,.62,.55],[.74,.43,.41],[.9,.55,.3],[.38,.36,.38],[.45,.3,.2],[.64,.47,.3],[.38,.78,.27],[.7,.68,.46],[.58,.76,.6],[.5,.62,.88],[.62,.62,.62],[.55,.8,.58],[.95,.58,.58],[.9,.78,.45]];
+const BC=[[0.553,0.706,0.784],[0.933,0.949,0.957],[0.31,0.42,0.322],[0.369,0.541,0.502],[0.788,0.698,0.541],[0.71,0.541,0.392],[0.38,0.36,0.38],[0.435,0.322,0.22],[0.45,0.3,0.2],[0.55,0.8,0.58],[0.831,0.78,0.643],[0.894,0.843,0.69],[0.902,0.827,0.761],[0.867,0.839,0.776],[0.89,0.835,0.769],[0.835,0.859,0.89],[0.835,0.867,0.831]];
+
+/* Administrative colours (neighbouring countries, Pakistan land with relief colours off, provinces) taken from atlas.html, one set per theme.
+   BC[11] = Pakistan base, BC[12..16] = India, Afghanistan, Iran, China, Central Asia. REGION_COLORS ids: 1 Sindh, 2 Balochistan, 3 Punjab, 4 KPK, 5 GB, 6 AJK, 7 ICT, 8 Kashmir.
+   ADMIN_K cancels the scene lighting (hemisphere .55 + directional 1 = about 1.32x on flat ground, which pushes pale colours to white), so flat ground renders as the hex values below. */
+const ADMIN_K=0.76;
+const ADMIN={
+ light:{base:'#e4d7b0',nb:['#e6d3c2','#ddd6c6','#e3d5c4','#d5dbe3','#d5ddd4'],prov:['#c5d7a4','#e0d0b4','#f3e2b0','#c9e4d6','#d5dbe6','#e6d3c0','#efe0c2','#e4d0c8']},
+ dark:{base:'#3d5340',nb:['#8b7a6a','#7c8370','#8b7a6a','#647f9b','#678a7b'],/* atlas dark values (#3a332c #33362e #3a332c #2c3844 #2a3832) lifted +28% lightness, same hue/saturation: lighter than the dark provinces (36-41%) so Pakistan reads as the darker, more saturated land */prov:['#5f7348','#6d624c','#7d7348','#4e6d5e','#5d6774','#6a5e50','#8a7b58','#4a3b40']}
+};
+const hexRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
+function applyAdminTheme(){const t=ADMIN[isD()?'dark':'light'];BC[11]=hexRGB(t.base);t.nb.forEach((h,k)=>{BC[12+k]=hexRGB(h)});t.prov.forEach((h,k)=>{REGION_COLORS[k+1]=hexRGB(h)})}
 const BN=['Sea','Glaciers & snow','Forest','Mangrove & wetland','Desert','Plateau','','Mountains & hills','','Irrigated plains','Dry plains','Land (colours off)'];
-document.getElementById('leg').innerHTML=BN.map((n,i)=>!n?'':'<div><i style="background:rgb('+BC[i].map(v=>v*255|0)+')"></i>'+n+'</div>').join('');document.getElementById('leg').insertAdjacentHTML('beforeend','<div><i style="background:#14181c;height:4px;border:none"></i>International</div><div><i style="background:#3a2c22;height:4px;border:none"></i>Province & region (always visible)</div><div><i style="background:#ff2d2d;height:4px;border:none"></i>Line of Control</div><div><i style="background:'+RIVER_HEX+';height:4px;border:none"></i>Rivers</div>');
+function buildLeg(){document.getElementById('leg').innerHTML=BN.map((n,i)=>!n?'':'<div><i style="background:rgb('+BC[i].map(v=>v*255|0)+')"></i>'+n+'</div>').join('');document.getElementById('leg').insertAdjacentHTML('beforeend','<div><i style="background:#14181c;height:4px;border:none"></i>International</div><div><i style="background:#3a3530;height:4px;border:none"></i>Province & region (always visible)</div><div><i style="background:#a33a3a;height:4px;border:none"></i>Line of Control</div><div><i style="background:'+RIVER_HEX+';height:4px;border:none"></i>Rivers</div>')}
+buildLeg();
 const BID=new Uint8Array(N);let OL=null;
 function bid(i){const e=E[i];if(e<0)return 0;if(!ins[i])return 11+cn[i];const ix=i%(NX+1),iy=(i/(NX+1))|0,lo=LON0+ix/NX*(LON1-LON0),la=LAT1-iy/NZ*(LAT1-LAT0);
 if(wg[i]>.5||e>6.2)return 1;
@@ -208,7 +196,7 @@ if(m.length==2)pts.push(...m[0],...m[1]);else if(m.length>2){const q=P3(a,c);for
 OL=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(pts,3)),new THREE.LineBasicMaterial({color:0x2e2e2e,transparent:true,opacity:.8}));OG.add(OL)}
 function paint(){const c=geo.attributes.color;for(let i=0;i<N;i++){const b=bid(i);BID[i]=b;const e=E[i],ix=i%(NX+1),lo=LON0+ix/NX*(LON1-LON0),la=LAT1-((i/(NX+1))|0)/NZ*(LAT1-LAT0),nz=Math.sin(lo*31+la*17)*Math.sin(lo*13-la*29);
 let f=1+nz*.04;if(b==0)f=1+Math.max(-.5,e)*.4+nz*.02;else if(b==7)f=1.08-(Math.min(e,6)-1.3)*.05+nz*.05;else if(b==5)f=1+(Math.min(e,5)-2)*.025+nz*.04;else if(b==4)f=1+nz*.08;else if(b==2)f=1+nz*.07;else if(b>=12)f=1-Math.min(e,5)*.02+nz*.025;
-const paletteIndex=(on.relief||b==0||b>11)?b:11;let col=BC[paletteIndex].map(v=>Math.min(1,v*f));/* Province colours replace only the plain-land fallback. When relief colours are enabled, biome/terrain colours remain on top and are never overwritten by administrative colours. */if((!on.relief||paletteIndex===11)&&ins[i]&&REGION[i]&&REGION_COLORS[REGION[i]]){const rc=REGION_COLORS[REGION[i]];col=rc.map(v=>Math.min(1,v*f))}c.setXYZ(i,col[0],col[1],col[2])}c.needsUpdate=true;outline()}
+const paletteIndex=(on.relief||b==0||b>11)?b:11;let col=BC[paletteIndex].map(v=>Math.min(1,v*f*(paletteIndex>=11?ADMIN_K:1)));/* Province colours replace only the plain-land fallback. When relief colours are enabled, biome/terrain colours remain on top and are never overwritten by administrative colours. */if((!on.relief||paletteIndex===11)&&ins[i]&&REGION[i]&&REGION_COLORS[REGION[i]]){const rc=REGION_COLORS[REGION[i]];col=rc.map(v=>Math.min(1,v*f*ADMIN_K))}c.setXYZ(i,col[0],col[1],col[2])}c.needsUpdate=true;outline()}
 function paintOld(){const c=geo.attributes.color;for(let i=0;i<N;i++){const e=E[i];let col;
 if(e<0)col=mix([.18,.58,.72],[.03,.17,.33],Math.min(1,-e*2.2));
 else{col=on.relief?mix(ramp(e),[.38,.62,.26],wp[i]*.9):(v=>[v,v,v])(Math.min(.85,.45+e*.06));
@@ -275,11 +263,11 @@ const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color,depthTest:true,
 mesh.frustumCulled=false;mesh.renderOrder=4;g.add(mesh)}
 function stroke(lines,color,halfW,g,lift,dash){const halo=0xf6f3ea;lines.forEach(p=>{ribbon(p,halo,halfW+.2,g,lift-.05,dash);ribbon(p,color,halfW,g,lift,dash)})}
 stroke([].concat(BND.other),0x2a3136,.16,BL,.28,false);
-stroke(BND.prov.sindh,0x241c14,.42,BL,.40,false);
-stroke(BND.prov.balochistan,0x241c14,.42,BL,.42,false);
-stroke(BND.prov.kpk,0x241c14,.42,BL,.44,false);
-stroke(BND.prov.punjab,0x241c14,.42,BL,.46,false);
-stroke(BND.prov.gb,0x241c14,.42,BL,.48,false);
+stroke(BND.prov.sindh,0x3a3530,.42,BL,.40,false);
+stroke(BND.prov.balochistan,0x3a3530,.42,BL,.42,false);
+stroke(BND.prov.kpk,0x3a3530,.42,BL,.44,false);
+stroke(BND.prov.punjab,0x3a3530,.42,BL,.46,false);
+stroke(BND.prov.gb,0x3a3530,.42,BL,.48,false);
 /* Treat Kashmir as one region: omit solid boundary segments that coincide with the LOC. */
 function withoutLocEdges(lines,tol=.16){
  const out=[],cs=Math.cos(34*Math.PI/180);
@@ -288,12 +276,12 @@ function withoutLocEdges(lines,tol=.16){
  for(const line of lines){let chain=[];for(let i=0;i<line.length-1;i++){const a=line[i],b=line[i+1],m=[(a[0]+b[0])/2,(a[1]+b[1])/2];if(near(a)||near(m)||near(b)){if(chain.length>1)out.push(chain);chain=[]}else{if(!chain.length)chain.push(a);chain.push(b)}}if(chain.length>1)out.push(chain)}
  return out;
 }
-stroke(withoutLocEdges(BND.prov.ajk,.42),0x241c14,.42,BL,.50,false);
+stroke(withoutLocEdges(BND.prov.ajk,.42),0x3a3530,.42,BL,.50,false);
 G.ict=new THREE.Group();sc.add(G.ict);
-stroke(BND.prov.ict,0x241c14,.42,BL,.52,false);
+stroke(BND.prov.ict,0x3a3530,.42,BL,.52,false);
 stroke([].concat(BND.iran,BND.afg,BND.china,withoutLocEdges(BND.india,.42),BND.coast),0x101418,.42,BL,.64,false);
 stroke(withoutLocEdges([IOK],.42),0x101418,.42,BL,.66,false);
-stroke(BND.loc,0xff2d2d,.32,G.loc,.9,true);
+stroke(BND.loc,0xa33a3a,.32,G.loc,.9,true);
 const BT=[['Durand Line (Afghanistan)','2,640 km',BND.afg[0]],['Pakistan–Iran border','959 km',BND.iran[0],.805,34],['Pakistan–China border','523 km',BND.china[0]],['Pakistan–India border','3,323 km incl. LOC',BND.india[0],.34,46,0],['Arabian Sea coastline','1,046 km',BND.coast[0]]];
 [].forEach(b=>{const P=b[2],s=[];let L=0;for(let i=0;i<P.length-1;i++){const d=Math.hypot((P[i+1][0]-P[i][0])*CL,P[i+1][1]-P[i][1]);s.push(d);L+=d}let t=L/2,i=0;while(i<s.length-1&&t>s[i]){t-=s[i];i++}const f=t/s[i],lo=P[i][0]+(P[i+1][0]-P[i][0])*f,la=P[i][1]+(P[i+1][1]-P[i][1])*f;
 let tx=(P[i+1][0]-P[i][0])*K*CL,tz=-(P[i+1][1]-P[i][1])*K;const l=Math.hypot(tx,tz);tx/=l;tz/=l;let nx=-tz,nz=tx;if(inP((X(lo)+nx*7)/(K*CL)+69,30-(Z(la)+nz*7)/K)){nx=-nx;nz=-nz}
@@ -309,11 +297,11 @@ let th=Math.atan2(-tz,tx);if(Math.abs(th)>Math.PI/2)th+=Math.PI;m.rotation.order
 const cone=new THREE.ConeGeometry(.9,2.4,6);
 [['K2 8,611 m',76.51,35.88,1,'K2 (Godwin-Austen): 2nd highest peak on Earth, Karakoram, on the Pakistan–China border.'],['Nanga Parbat 8,126 m',74.59,35.24,3,'Nanga Parbat: 9th highest, western anchor of the Himalaya, Gilgit-Baltistan; "Killer Mountain".'],['Gasherbrum I 8,080 m',76.7,35.73,3,'Gasherbrum I (Hidden Peak): 11th highest, Karakoram.'],['Broad Peak 8,051 m',76.57,35.81,3,'Broad Peak: 12th highest, Karakoram. Pakistan has five of the world\'s 8,000 m peaks (K2, G-I, G-II, Broad Peak, Nanga Parbat).'],['Rakaposhi 7,788 m',74.49,36.14,3,'Rakaposhi: Karakoram, above Hunza/Nagar.'],['Tirich Mir 7,708 m',71.84,36.25,3,'Tirich Mir: highest peak of the Hindu Kush, Chitral.'],['Takht-e-Suleiman 3,487 m',69.97,31.62,3,'Highest peak of the Suleiman Range.'],['Sakesar 1,522 m',71.93,32.54,4,'Sakesar: highest peak of the Salt Range.']].forEach(p=>{dot(G.mountains,cone,0xeeeeee,p[1],p[2],1.2);L('mountains',p[0],p[1],p[2],p[3],p[4],'',3.5)});
 const bx=new THREE.BoxGeometry(1,1,1);
-[['Khyber Pass',71.1,34.1,'Khyber Pass: Peshawar–Kabul route, ~1,070 m; Torkham crossing.'],['Bolan Pass',67.4,29.5,'Bolan Pass: links Sibi/Quetta with the Indus plain; historic route.'],['Khunjerab Pass',75.4,36.85,'Khunjerab Pass 4,693 m: highest paved border crossing; Karakoram Highway, Pakistan–China.']].forEach(p=>{dot(G.mountains,bx,0xff9a3a,p[1],p[2],.6);L('mountains',p[0],p[1],p[2],3,p[3],'',2.2)});
+[['Khyber Pass',71.1,34.1,'Khyber Pass: Peshawar–Kabul route, ~1,070 m; Torkham crossing.'],['Bolan Pass',67.4,29.5,'Bolan Pass: links Sibi/Quetta with the Indus plain; historic route.'],['Khunjerab Pass',75.4,36.85,'Khunjerab Pass 4,693 m: highest paved border crossing; Karakoram Highway, Pakistan–China.']].forEach(p=>{dot(G.mountains,bx,0xb5703a,p[1],p[2],.6);L('mountains',p[0],p[1],p[2],3,p[3],'',2.2)});
 [['Karakoram Range',76,36.1,1,'Karakoram: ~65% of non-polar glaciers; K2, Gasherbrum, Broad Peak; home to Siachen, Baltoro, Biafo.'],['Himalaya',74.2,34.4,1,'Western Himalaya: Pir Panjal, Nanga Parbat massif; formed by the Indian–Eurasian collision.'],['Hindu Kush',71,35.9,1,'Hindu Kush: runs from Afghanistan into Chitral; Tirich Mir is its highest peak.'],['Suleiman Range',69.7,31.1,2,'Suleiman Range: eastern edge of the Iranian plateau; Takht-e-Suleiman.'],['Kirthar Range',67.3,26.9,2,'Kirthar Range: Sindh–Balochistan boundary.'],['Makran Coastal Range',64.5,25.9,2,'Makran: arid coastal ranges of Balochistan.'],['Salt Range',72.5,32.7,3,'Salt Range: Khewra salt mine; separates Potohar from the Punjab plain.'],['Toba Kakar',66.8,31.1,3,'Toba Kakar: ranges around Quetta/Zhob.']].forEach(p=>L('mountains',p[0],p[1],p[2],p[3],p[4],'big',4));
 G.plates=new THREE.Group();
-const PL=[[[61.5,24.6],[63,24.4],[64.5,24.6],[66,24.3]],0xff5a36],PT=[[[66,24.3],[66.3,23.2]],[[66.5,25],[66.3,26],[66.2,27.5],[65.9,29],[66.4,30.2],[66.9,31],[67.5,32.4],[68.4,33.7],[68.8,34.5],[70,35.2],[71.5,35.6]]],MM=[[71.5,35.6],[72.8,35.4],[73.7,35.1],[74.5,35],[75.5,34.9],[76.5,34.6],[77.5,34.3]];
-tube(PL[0],0xff5a36,.4,G.plates);PT.forEach(l=>tube(l,0xffd23a,.4,G.plates));tube(MM,0xff5a36,.4,G.plates);
+const PL=[[[61.5,24.6],[63,24.4],[64.5,24.6],[66,24.3]],0x9c4a3a],PT=[[[66,24.3],[66.3,23.2]],[[66.5,25],[66.3,26],[66.2,27.5],[65.9,29],[66.4,30.2],[66.9,31],[67.5,32.4],[68.4,33.7],[68.8,34.5],[70,35.2],[71.5,35.6]]],MM=[[71.5,35.6],[72.8,35.4],[73.7,35.1],[74.5,35],[75.5,34.9],[76.5,34.6],[77.5,34.3]];
+tube(PL[0],0x9c4a3a,.4,G.plates);PT.forEach(l=>tube(l,0xc49a3a,.4,G.plates));tube(MM,0x9c4a3a,.4,G.plates);
 [['INDIAN PLATE',71,27.8,1,'Indian Plate: Pakistan\'s east and south. Moves north ~4–5 cm/yr, colliding with Eurasia ~50 million years ago to raise the Himalaya, Karakoram and Hindu Kush.','big'],['EURASIAN PLATE',64.5,33.5,1,'Eurasian Plate: north-western Pakistan, Afghanistan. Balochistan\'s Chaman area is its transform contact with the Indian Plate.','big'],['ARABIAN PLATE',62.5,23.2,1,'Arabian Plate: subducts beneath the Eurasian Plate at the Makran Subduction Zone.','big'],['Makran Subduction Zone',63.5,24.5,2,'Convergent boundary off Balochistan; caused the 1945 Makran earthquake and tsunami.',''],['Chaman Fault',66.4,30.2,3,'Chaman Fault: left-lateral transform boundary between the Indian and Eurasian plates.',''],['Owen Fracture Zone',66.3,23.4,3,'Transform boundary between the Arabian and Indian plates.',''],['Main Mantle Thrust',73.7,35.1,3,'Main Mantle Thrust: Himalayan suture zone; the 2005 Kashmir earthquake struck nearby.','']].forEach(p=>L('plates',p[0],p[1],p[2],p[3],p[4],p[5],2));
 
 PLI.forEach(p=>L('plateaus',p[4],p[0],p[1],p[5],p[6],p[5]==1?'big':'',3));
@@ -529,7 +517,7 @@ function show(l){
  inf.innerHTML=html;inf.scrollTop=0
 }
 const tm=document.getElementById('tm'),rt=document.documentElement,isD=()=>rt.dataset.theme?rt.dataset.theme=='dark':matchMedia('(prefers-color-scheme: dark)').matches;
-function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);tm.innerHTML=isD()?'<span>\u2600</span><span class="lb"> Light</span>':'<span>\u263e</span><span class="lb"> Dark</span>'}
+function theme(){const bg=getComputedStyle(rt).getPropertyValue('--bg').trim();rd.setClearColor(bg);sc.fog.color.set(bg);applyAdminTheme();buildLeg();if(window.__painted)paint();tm.innerHTML=isD()?'<span>\u2600</span><span class="lb"> Light</span>':'<span>\u263e</span><span class="lb"> Dark</span>'}
 tm.onclick=()=>{rt.dataset.theme=isD()?'light':'dark';theme()};matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);theme();
 /* camera */
 let A=0,El=.95,R=230,T=new V(7,0,-2),touched=false;const fit=()=>Math.min(480,Math.max(230,210/cam.aspect));
@@ -542,13 +530,29 @@ function setView(which){
 }
 function size(){rd.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();if(!touched)R=fit()}
 addEventListener('resize',size);size();R=Math.min(480,Math.max(230,210/cam.aspect));const R0=R;
+/* Navigation input. Pan, orbit and zoom are separate operations and no input triggers more than one of them.
+   Zoom:  two-finger scroll or mouse wheel, trackpad pinch (Chrome/Edge/Firefox deliver it as a wheel event with a browser-made ctrlKey, Safari as gesture events), and the + / - keys.
+   Pan:   left-drag, Ctrl + move one finger/cursor (no click needed), Ctrl + click-drag, Ctrl + two-finger scroll.
+   Orbit: hold Shift with any of those (Ctrl + Shift + move/drag/scroll), or Shift + scroll/drag on its own. Right-drag also orbits.
+   Touch screens keep their own mapping: one finger orbits, two fingers pan and pinch. */
+const NAV={pinch:1,scrollZoom:1,scrollPan:1,scrollOrbit:1,keyZoom:1};/* sensitivity multipliers, 1 = default; pinch has its own */
+const PINCH_RATE=.014,PINCH_MAX=30,KEY_RATE=1.2,LINE_PX=33;/* pinch: zoom per wheel-delta unit, per-event cap; keys: zoom rate per second */
+const SCROLL_RATE=.001,SCROLL_BOOST=.002,SCROLL_MAX=200;/* scroll zoom: a mouse notch (100) zooms about 10% as before; small trackpad deltas get up to 3x more per unit */
+const NAVDEBUG=/[?&]inputdebug\b/.test(location.search);/* add ?inputdebug to the page address to log input events in the console */
+let ctrlDown=false,hv=null;/* ctrlDown: the physical Ctrl key (a pinch also arrives as wheel+ctrlKey, made by the browser, so the key itself is tracked); hv: last hover position */
+const zoomBy=f=>{R=Math.min(560,Math.max(28,R*f))};
+const scrollZoom=dy=>{const a=Math.min(Math.abs(dy),SCROLL_MAX);return Math.exp(Math.sign(dy)*a*(SCROLL_RATE+SCROLL_BOOST*Math.max(0,1-a/50))*NAV.scrollZoom)};
+function orbit(dx,dy){A-=dx*.006;El=Math.min(1.5,Math.max(.15,El+dy*.006))}
 const P=new Map();let ld=0,lm=[0,0],moved=0;
 const ang=()=>{const a=[...P.values()];return Math.atan2(a[1][1]-a[0][1],a[1][0]-a[0][0])};let lang=0;
 const mid=()=>{const a=[...P.values()];return[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2,Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])]};
 function pan(dx,dy){const s=R*.0016;T.x-=Math.cos(A)*dx*s-Math.sin(A)*dy*s*-1;T.z+=-Math.sin(A)*dx*s*-1-Math.cos(A)*dy*s}
-cv.addEventListener('pointerdown',e=>{touched=true;cv.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY,e.button]);moved=0;if(P.size==2){const m=mid();lm=[m[0],m[1]];ld=m[2];lang=ang()}});
-cv.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);p[0]=e.clientX;p[1]=e.clientY;
-if(P.size==1){if(p[2]==2||e.shiftKey)pan(dx,dy);else{A-=dx*.006;El=Math.min(1.5,Math.max(.15,El+dy*.006))}}
+cv.addEventListener('pointerdown',e=>{touched=true;hv=null;ctrlDown=e.ctrlKey;if(NAVDEBUG)console.log('pointerdown',{type:e.pointerType,button:e.button,ctrl:e.ctrlKey,shift:e.shiftKey});if(e.pointerType!=='touch')e.preventDefault();cv.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY,e.button,e.pointerType]);moved=0;if(P.size==2){const m=mid();lm=[m[0],m[1]];ld=m[2];lang=ang()}});
+cv.addEventListener('pointermove',e=>{ctrlDown=e.ctrlKey;const p=P.get(e.pointerId);
+if(!p){/* no button down: Ctrl + moving one finger (or the cursor) pans, adding Shift orbits. The first move only records a start point. */
+ const h=hv;hv=[e.clientX,e.clientY];if(h&&e.ctrlKey&&!e.buttons&&e.pointerType!=='touch'){touched=true;const hx=e.clientX-h[0],hy=e.clientY-h[1];if(e.shiftKey)orbit(hx,hy);else pan(hx,hy)}return}
+const dx=e.clientX-p[0],dy=e.clientY-p[1];moved+=Math.abs(dx)+Math.abs(dy);p[0]=e.clientX;p[1]=e.clientY;
+if(P.size==1){/* Shift always orbits; Ctrl always pans; otherwise right-drag orbits and left/middle-drag pans. A touch screen's single finger orbits. Modifiers are read live, so they can change mid-drag. */if(p[3]==='touch'||e.shiftKey||(p[2]==2&&!e.ctrlKey))orbit(dx,dy);else pan(dx,dy)}
 else if(P.size==2){const m=mid();R=Math.min(560,Math.max(28,R*ld/Math.max(1,m[2])));pan(m[0]-lm[0],m[1]-lm[1]);lm=[m[0],m[1]];ld=m[2]}});
 const borderRay=new THREE.Raycaster(),borderPoint=new THREE.Vector2();
 function pickBorder(x,y,touch=false){
@@ -567,12 +571,34 @@ function pickBorder(x,y,touch=false){
  }
  return null;
 }
-const up=e=>{if(P.size==1&&moved<8){const image=pickBorder(e.clientX,e.clientY,e.pointerType==='touch');if(image){show(image);P.delete(e.pointerId);return;}let b=null,bd=1600;for(const l of LB)if(l.s&&l.info){const d=(l.sx-e.clientX)**2+(l.sy-e.clientY)**2;if(d<bd){bd=d;b=l}}if(b)show(b)}P.delete(e.pointerId)};
-cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>P.delete(e.pointerId));
-cv.addEventListener('wheel',e=>{touched=true;e.preventDefault();R=Math.min(560,Math.max(28,R*Math.exp(e.deltaY*.001)))},{passive:false});
+const up=e=>{hv=null;if(P.size==1&&moved<8&&(P.get(e.pointerId)||[])[2]===0){const image=pickBorder(e.clientX,e.clientY,e.pointerType==='touch');if(image){show(image);P.delete(e.pointerId);return;}let b=null,bd=1600;for(const l of LB)if(l.s&&l.info){const d=(l.sx-e.clientX)**2+(l.sy-e.clientY)**2;if(d<bd){bd=d;b=l}}if(b)show(b)}P.delete(e.pointerId)};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>{P.delete(e.pointerId);hv=null});cv.addEventListener('pointerleave',()=>{hv=null});
+/* Wheel events. A pinch on Chrome/Edge/Firefox arrives with ctrlKey set even though Ctrl is not pressed, so a wheel event counts as a pinch only when ctrlKey is set and the physical Ctrl key is not down. */
+cv.addEventListener('wheel',e=>{touched=true;e.preventDefault();
+ const u=e.deltaMode===1?LINE_PX:e.deltaMode===2?innerHeight:1,dx=e.deltaX*u,dy=e.deltaY*u;/* normalise lines/pages to pixels (Firefox reports mouse-wheel notches in lines) */
+ const pinch=e.ctrlKey&&!ctrlDown;
+ if(NAVDEBUG)console.log('wheel',{dx:e.deltaX,dy:e.deltaY,mode:e.deltaMode,ctrl:e.ctrlKey,ctrlKeyDown:ctrlDown,shift:e.shiftKey,as:pinch?'pinch':e.shiftKey?'orbit':e.ctrlKey?'pan':'zoom'});
+ if(pinch)zoomBy(Math.exp(Math.max(-PINCH_MAX,Math.min(PINCH_MAX,dy))*PINCH_RATE*NAV.pinch));/* pinch: zoom, with its own sensitivity */
+ else if(e.shiftKey)orbit(-dx*NAV.scrollOrbit,-dy*NAV.scrollOrbit);/* Shift (with or without Ctrl) + scroll: orbit, camera follows the fingers */
+ else if(e.ctrlKey)pan(-dx*NAV.scrollPan,-dy*NAV.scrollPan);/* Ctrl + scroll: pan, map follows the fingers (respects the OS natural-scrolling setting) */
+ else zoomBy(scrollZoom(dy));/* plain scroll or mouse wheel: zoom */
+},{passive:false});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
+/* Safari (macOS) reports a trackpad pinch as gesture events, not wheel events. iOS also fires them during a two-finger touch pinch, which the pointer code already handles, so they are ignored while a touch is down. */
+let gR=0;const touching=()=>[...P.values()].some(p=>p[3]==='touch');
+cv.addEventListener('gesturestart',e=>{e.preventDefault();touched=true;gR=R});
+cv.addEventListener('gesturechange',e=>{e.preventDefault();if(!touching()&&e.scale>0)R=Math.min(560,Math.max(28,gR/Math.pow(e.scale,NAV.pinch)))});
+cv.addEventListener('gestureend',e=>e.preventDefault());
+/* Keyboard zoom: + (or =) zooms in, - zooms out, numpad included; hold for continuous zoom. Ignored while typing and with Ctrl/Cmd/Alt, so browser zoom shortcuts keep working. */
+const KEY_ZOOM={'+':-1,'=':-1,'-':1,'_':1},held=new Map();let keyT=0;
+const typing=t=>!!t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+addEventListener('keydown',e=>{if(e.key==='Control')ctrlDown=true;const d=KEY_ZOOM[e.key];if(!d||e.ctrlKey||e.metaKey||e.altKey||typing(e.target))return;e.preventDefault();touched=true;held.set(e.code,d)});
+addEventListener('keyup',e=>{if(e.key==='Control')ctrlDown=false;held.delete(e.code)});
+addEventListener('blur',()=>{held.clear();ctrlDown=false;hv=null});
+function stepKeys(now){const dt=keyT?Math.min(.05,(now-keyT)/1000):0;keyT=now;if(!held.size)return;let d=0;for(const v of held.values())d+=v;if(d)zoomBy(Math.exp(Math.sign(d)*KEY_RATE*NAV.keyZoom*dt))}
+/* end navigation input */
 const v=new V(),labelOrder=[...LB].sort((a,b)=>a.priority-b.priority||a.tier-b.tier||LB.indexOf(a)-LB.indexOf(b));
-function frame(){cam.position.set(T.x+R*Math.cos(El)*Math.sin(A),T.y+R*Math.sin(El),T.z+R*Math.cos(El)*Math.cos(A));cam.lookAt(T);rd.render(sc,cam);
+function frame(){stepKeys(performance.now());cam.position.set(T.x+R*Math.cos(El)*Math.sin(A),T.y+R*Math.sin(El),T.z+R*Math.cos(El)*Math.cos(A));cam.lookAt(T);rd.render(sc,cam);
 const W=innerWidth,H=innerHeight,used=[],zoom=R/fit();
 for(const l of labelOrder){
  // Independent eligibility state prevents collision rejection from resetting zoom hysteresis.
@@ -588,7 +614,7 @@ for(const l of labelOrder){
  l.s=s;l.el.style.display=s?'block':'none';
 }
 requestAnimationFrame(frame)}
-document.getElementById('leg').style.display='block';legendVisible=true;sync();frame();
+document.getElementById('leg').style.display='block';legendVisible=true;sync();window.__painted=true;frame();
 </script><script>
 (function(){
   var btn=document.getElementById('navBtn'),drop=document.getElementById('navDrop');
