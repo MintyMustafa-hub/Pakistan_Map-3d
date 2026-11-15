@@ -1,28 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Website Title -->
-  <title>Pakistan 3D Atlas</title>
-
-  <!-- Browser Tab Logo (Favicon) -->
-  <link rel="icon" type="image/png" href="/image/logo.png">
-  <link rel="apple-touch-icon" href="/image/logo.png">
-
-  <!-- Social Media Preview -->
-  <meta property="og:title" content="Pakistan 3D Atlas">
-  <meta property="og:description" content="Explore Pakistan's geography through an interactive 3D topographic atlas.">
-  <meta property="og:image" content="https://pakistan3datlas.com/image/logo.png">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://pakistan3datlas.com/">
-
-  <!-- Twitter/X Preview -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Pakistan 3D Atlas">
-  <meta name="twitter:description" content="Explore Pakistan's geography through an interactive 3D topographic atlas.">
-  <meta name="twitter:image" content="https://pakistan3datlas.com/image/logo.png">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pakistan Atlas — Trade Routes</title>
@@ -87,7 +65,9 @@ html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--
 @media (max-width:359px){#quick{gap:4px}#quick .c{padding:5px 7px}}
 
 #cv{background:var(--sea);z-index:0}
-#svg{width:100%;height:100%;display:block;touch-action:none}
+#svg{width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{touch-action:manipulation}   /* no browser double-tap page zoom anywhere outside the map; the map and scrolling panels set their own touch-action */
+.ht{display:none}@media(pointer:coarse){.hm{display:none}.ht{display:inline}}
 #lab{z-index:1}
 .l{pointer-events:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;outline:none}
 .l.big{font-size:15px}
@@ -150,13 +130,13 @@ button,.c,.tg{cursor:pointer}
 </section>
 <div id="lab"></div>
 <div class="ui" id="top"><div class="hd"><span class="ttl">Pakistan Atlas</span><button class="tg" id="tb" type="button">Hide</button></div>
-<small>Drag: pan · Scroll or pinch: zoom · Tap a port, route or label for notes · No rotation</small></div>
+<small><span class="hm">Scroll, pinch or + / −: zoom · Drag, Ctrl + move or Ctrl + scroll: pan</span><span class="ht">Drag: pan · Pinch or double-tap: zoom</span> · Tap a port, route or label for notes · No rotation</small></div>
 <div id="quick">
 <button class="c" id="rp" type="button" title="Report a mistake"><span>⚑ Report</span><span class="lb"> a mistake</span></button>
 <button class="c" id="resetView" type="button">Reset view</button>
 <button class="c" id="changeView" type="button">Change view</button>
 <button class="c" id="tm" type="button"></button>
-<div id="navMenu"><button type="button" class="c" id="navBtn" aria-label="Open navigation menu" aria-haspopup="true" aria-expanded="false" aria-controls="navDrop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div id="navDrop" hidden><a href="https://pakistan3datlas.com/" id="navHome">Back to Pakistan Map</a><a href="https://www.chailink.co/mintymustafa" id="navChai" class="chai" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V9z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2M11 3.5v2"/></svg>Buy me a chai</a></div></div>
+<div id="navMenu"><button type="button" class="c" id="navBtn" aria-label="Open navigation menu" aria-haspopup="true" aria-expanded="false" aria-controls="navDrop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div id="navDrop" hidden><a href="https://mintymustafa-hub.github.io/Pakistan_Map-3d/" id="navHome">Back to Pakistan Map</a><a href="https://www.chailink.co/mintymustafa" id="navChai" class="chai" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5V9z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2M11 3.5v2"/></svg>Buy me a chai</a></div></div>
 </div>
 <div class="ui" id="infow"><div class="hd"><b>Notes</b><button class="tg" id="ib" type="button">Hide</button></div>
 <div id="info"></div></div>
@@ -502,6 +482,7 @@ function apply() {
   placeLabels();
 }
 function fitBox(lon0, lat0, lon1, lat1, pad) {
+  cancelAnim();
   pad = pad == null ? 36 : pad;
   const p1 = proj(lon0, lat1), p2 = proj(lon1, lat0);
   const minx = Math.min(p1[0], p2[0]), maxx = Math.max(p1[0], p2[0]);
@@ -531,6 +512,60 @@ function zoomAt(cx, cy, factor) {
   apply();
 }
 
+/* Navigation input. This is a 2D map, so there is no orbit and Shift has no special meaning.
+   Zoom:  two-finger scroll or mouse wheel, trackpad pinch (Chrome/Edge/Firefox deliver it as a wheel event with a browser-made ctrlKey, Safari as
+          gesture events), the + / - keys, and double-tap on touch screens. Wheel, pinch and double-tap zoom toward the cursor or fingers; keys toward the screen centre.
+   Pan:   left-drag, Ctrl + move one finger/cursor (no click needed), Ctrl + click-drag, Ctrl + two-finger scroll.
+   Touch screens: one finger pans, two fingers pinch and pan, double-tap zooms in and a second double-tap zooms back out. */
+const NAV = {pinch:1, scrollZoom:1, scrollPan:1, keyZoom:1};          // sensitivity multipliers, 1 = default; pinch has its own
+const PINCH_RATE = 0.014, PINCH_MAX = 30, KEY_RATE = 1.2, LINE_PX = 33; // pinch: zoom per wheel-delta unit and per-event cap; keys: zoom rate per second
+const SCROLL_RATE = 0.0012, SCROLL_BOOST = 0.0024, SCROLL_MAX = 200;   // scroll zoom: a mouse notch (100) zooms about 11% as before; small trackpad deltas get up to 3x more per unit
+const DBL_MS = 280, DBL_PX = 40, DBL_ZOOM = 2, ANIM_MS = 240;           // double-tap: time and distance window, zoom factor; zoom animation length
+const NAVDEBUG = /[?&]inputdebug\b/.test(location.search);              // add ?inputdebug to the page address to log input events in the console
+let ctrlDown = false, hv = null;   // ctrlDown: the physical Ctrl key (a pinch also arrives as wheel+ctrlKey made by the browser, so the key itself is tracked); hv: last hover position
+const scrollFactor = dy => { const a = Math.min(Math.abs(dy), SCROLL_MAX); return Math.exp(-Math.sign(dy) * a * (SCROLL_RATE + SCROLL_BOOST * Math.max(0, 1 - a / 50)) * NAV.scrollZoom); };
+
+var anim = 0;   // var (not let): fitBox() calls cancelAnim() while the page is starting up
+function cancelAnim() { if (anim) { cancelAnimationFrame(anim); anim = 0; } }
+function zoomAnimated(cx, cy, factor) {   // eased zoom about a screen point; any new input cancels it
+  cancelAnim();
+  const k0 = view.k, k1 = Math.max(K_MIN, Math.min(K_MAX, k0 * factor));
+  if (k1 === k0) return;
+  const t0 = performance.now(); let prev = 1;
+  const step = now => {
+    const t = Math.max(0, Math.min(1, (now - t0) / ANIM_MS)), f = Math.pow(k1 / k0, 1 - Math.pow(1 - t, 3));
+    zoomAt(cx, cy, f / prev); prev = f;
+    anim = t < 1 ? requestAnimationFrame(step) : 0;
+  };
+  anim = requestAnimationFrame(step);
+}
+
+/* Double-tap (touch and pen). The browser's own double-tap page zoom is switched off in CSS, and the page's dblclick event is ignored for touch,
+   so this is the only double-tap behaviour. A tap on a note target waits one double-tap window before opening its notes, so a double-tap zooms
+   cleanly instead of opening the notes panel first. Mouse clicks are not delayed. */
+let lastTap = null, pendNote = '', tapTimer = 0, lastTouchUp = -1e9, secondDown = false, tapZoom = 0;   // tapZoom: the zoom level the last double-tap zoomed in to (0 = none)
+function flushNote() { clearTimeout(tapTimer); tapTimer = 0; if (pendNote) { const id = pendNote; pendNote = ''; show({t:id}); } }
+
+/* Keyboard zoom: + (or =) zooms in, - zooms out, numpad included; hold for continuous zoom. Ignored while typing and with Ctrl/Cmd/Alt, so browser zoom shortcuts keep working. */
+const KEY_ZOOM = {'+':1, '=':1, '-':-1, '_':-1}, keysHeld = new Map();
+let keyRaf = 0, keyT = 0;
+const typing = t => !!t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+function keyStep(now) {
+  const dt = keyT ? Math.max(0, Math.min(0.05, (now - keyT) / 1000)) : 0; keyT = now; keyRaf = 0;
+  let d = 0; for (const v of keysHeld.values()) d += v;
+  if (d) zoomAt(innerWidth / 2, innerHeight / 2, Math.exp(Math.sign(d) * KEY_RATE * NAV.keyZoom * dt));
+  if (keysHeld.size) keyRaf = requestAnimationFrame(keyStep); else keyT = 0;
+}
+addEventListener('keydown', e => {
+  if (e.key === 'Control') ctrlDown = true;
+  const d = KEY_ZOOM[e.key];
+  if (!d || e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
+  e.preventDefault(); cancelAnim(); keysHeld.set(e.code, d);
+  if (!keyRaf) { keyT = performance.now(); keyRaf = requestAnimationFrame(keyStep); }
+});
+addEventListener('keyup', e => { if (e.key === 'Control') ctrlDown = false; keysHeld.delete(e.code); });
+addEventListener('blur', () => { keysHeld.clear(); ctrlDown = false; hv = null; });
+
 /* pointer: one gesture system for mouse, pen and touch.
    1 pointer  -> pan.
    2 pointers -> pinch-zoom and pan together: each move, the map point that was under the previous finger midpoint is kept under
@@ -546,16 +581,28 @@ function snap() {
   return {x:(a[0].x + a[1].x) / 2, y:(a[0].y + a[1].y) / 2, d:Math.max(1, Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y))};
 }
 svg.addEventListener('pointerdown', e => {
-  if (e.pointerType === 'mouse' && e.button === 2) return;
+  if (e.pointerType === 'mouse' && e.button === 2 && !e.ctrlKey) return;   // right-click does nothing here (no orbit); Ctrl always pans, which also covers macOS Ctrl+click arriving as a right-click
   if (PT.size >= 2) return;                       // ignore a third finger
   try { svg.setPointerCapture(e.pointerId); } catch (_) {}
-  if (PT.size === 0) { moved = 0; multi = false; downXY = [e.clientX, e.clientY]; }
+  cancelAnim(); hv = null; ctrlDown = e.ctrlKey;
+  if (NAVDEBUG) console.log('pointerdown', {type:e.pointerType, button:e.button, ctrl:e.ctrlKey});
+  if (PT.size === 0) {
+    moved = 0; multi = false; downXY = [e.clientX, e.clientY]; secondDown = false;
+    // second tap of a possible double-tap: hold back the first tap's notes until we know
+    if (e.pointerType !== 'mouse' && lastTap && e.timeStamp - lastTap.t < DBL_MS && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < DBL_PX) { secondDown = true; clearTimeout(tapTimer); tapTimer = 0; }
+  }
   PT.set(e.pointerId, {x:e.clientX, y:e.clientY});
   if (PT.size === 2) multi = true;
   gPrev = snap();
 });
 svg.addEventListener('pointermove', e => {
-  const p = PT.get(e.pointerId); if (!p) return;
+  ctrlDown = e.ctrlKey;
+  const p = PT.get(e.pointerId);
+  if (!p) {   // no button down: Ctrl + moving one finger (or the cursor) pans. The first move only records a start point.
+    const h = hv; hv = [e.clientX, e.clientY];
+    if (h && e.ctrlKey && !e.buttons && e.pointerType !== 'touch') { view.x += e.clientX - h[0]; view.y += e.clientY - h[1]; touched = true; schedule(); }
+    return;
+  }
   const dx = e.clientX - p.x, dy = e.clientY - p.y;
   if (!dx && !dy) return;
   moved += Math.abs(dx) + Math.abs(dy);
@@ -587,23 +634,55 @@ function pick(x, y) {
 function endPointer(e, canTap) {
   if (!PT.has(e.pointerId)) return;
   const tap = canTap && !multi && moved < 8 && Math.hypot(e.clientX - downXY[0], e.clientY - downXY[1]) < 8;
-  PT.delete(e.pointerId);
+  const touchy = e.pointerType !== 'mouse';
+  PT.delete(e.pointerId); hv = null;
   gPrev = snap();                                  // 2 -> 1 finger: nothing to carry over, panning resumes from the remaining finger
-  if (tap && PT.size === 0) {
+  if (PT.size) return;
+  if (touchy) lastTouchUp = performance.now();
+  if (tap && touchy) {
+    if (secondDown) {                              // double-tap: toggles between zooming in and out, never opens notes
+      secondDown = false; pendNote = ''; lastTap = null;
+      const kIn = Math.min(K_MAX, view.k * DBL_ZOOM);
+      // Zoom out when the view is still at (or beyond) the level a double-tap zoomed to, or when there is no room left to zoom in.
+      // Panning does not matter; pinching back out past that level makes the next double-tap zoom in again.
+      if ((tapZoom && view.k >= tapZoom * 0.85) || kIn <= view.k * 1.001) { tapZoom = 0; zoomAnimated(e.clientX, e.clientY, 1 / DBL_ZOOM); }
+      else { tapZoom = kIn; zoomAnimated(e.clientX, e.clientY, DBL_ZOOM); }
+      return;
+    }
+    lastTap = {t:e.timeStamp, x:e.clientX, y:e.clientY};
+    const id = pick(e.clientX, e.clientY);
+    if (id && NOTES[id]) { pendNote = id; clearTimeout(tapTimer); tapTimer = setTimeout(flushNote, DBL_MS); }
+    return;
+  }
+  if (touchy) lastTap = null;                      // a drag or pinch ends any double-tap in progress
+  if (secondDown) { secondDown = false; flushNote(); }   // the second touch turned out to be a drag: show the first tap's notes now
+  if (tap) {
     const id = pick(e.clientX, e.clientY);
     if (id && NOTES[id]) show({t:id});
   }
 }
 svg.addEventListener('pointerup', e => endPointer(e, true));
 svg.addEventListener('pointercancel', e => endPointer(e, false));
-['gesturestart', 'gesturechange', 'gestureend'].forEach(t => svg.addEventListener(t, e => e.preventDefault()));   // stop iOS Safari page-zoom on the map
+svg.addEventListener('pointerleave', () => { hv = null; });
+/* Safari (macOS) reports a trackpad pinch as gesture events, not wheel events. iOS also fires them during a two-finger touch pinch, which the pointer code
+   already handles, so they are ignored while any pointer is down. They are always cancelled so Safari cannot zoom the page. */
+let gK = 1, gX = 0, gY = 0;
+svg.addEventListener('gesturestart', e => { e.preventDefault(); cancelAnim(); gK = view.k; gX = Number.isFinite(e.clientX) ? e.clientX : hv ? hv[0] : innerWidth / 2; gY = Number.isFinite(e.clientY) ? e.clientY : hv ? hv[1] : innerHeight / 2; });
+svg.addEventListener('gesturechange', e => { e.preventDefault(); if (!PT.size && e.scale > 0) zoomAt(gX, gY, gK * Math.pow(e.scale, NAV.pinch) / view.k); });
+svg.addEventListener('gestureend', e => e.preventDefault());
+/* Wheel events. A pinch on Chrome/Edge/Firefox arrives with ctrlKey set even though Ctrl is not pressed, so a wheel event counts as a pinch only when
+   ctrlKey is set and the physical Ctrl key is not down. Two-finger scroll / mouse wheel zooms; Ctrl + scroll pans. */
 svg.addEventListener('wheel', e => {
-  e.preventDefault();
-  let dy = e.deltaY; if (e.deltaMode === 1) dy *= 16; else if (e.deltaMode === 2) dy *= innerHeight;
-  zoomAt(e.clientX, e.clientY, Math.max(0.7, Math.min(1.4, Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0012)))));
+  e.preventDefault(); cancelAnim();
+  const u = e.deltaMode === 1 ? LINE_PX : e.deltaMode === 2 ? innerHeight : 1, dx = e.deltaX * u, dy = e.deltaY * u;   // lines/pages to pixels (Firefox reports mouse-wheel notches in lines)
+  const pinch = e.ctrlKey && !ctrlDown;
+  if (NAVDEBUG) console.log('wheel', {dx:e.deltaX, dy:e.deltaY, mode:e.deltaMode, ctrl:e.ctrlKey, ctrlKeyDown:ctrlDown, as:pinch ? 'pinch' : e.ctrlKey ? 'pan' : 'zoom'});
+  if (pinch) zoomAt(e.clientX, e.clientY, Math.exp(-Math.max(-PINCH_MAX, Math.min(PINCH_MAX, dy)) * PINCH_RATE * NAV.pinch));   // pinch: zoom, with its own sensitivity
+  else if (e.ctrlKey) { view.x -= dx * NAV.scrollPan; view.y -= dy * NAV.scrollPan; touched = true; schedule(); }           // Ctrl + scroll: pan, the map follows the fingers
+  else if (dy) zoomAt(e.clientX, e.clientY, scrollFactor(dy));                                                            // plain scroll or mouse wheel: zoom
 }, {passive:false});
 svg.addEventListener('contextmenu', e => e.preventDefault());
-svg.addEventListener('dblclick', e => { zoomAt(e.clientX, e.clientY, 1.6); });
+svg.addEventListener('dblclick', e => { if (performance.now() - lastTouchUp < 800) return; zoomAnimated(e.clientX, e.clientY, 1.6); });   // mouse only: touch has its own double-tap above
 addEventListener('resize', () => { if (!touched) setView('region'); else apply(); });
 
 /* ---------- notes (wording for shared features kept from the existing atlas) ---------- */
