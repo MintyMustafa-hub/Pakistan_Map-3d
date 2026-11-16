@@ -130,7 +130,7 @@ button,.c,.tg{cursor:pointer}
 </section>
 <div id="lab"></div>
 <div class="ui" id="top"><div class="hd"><span class="ttl">Pakistan Atlas</span><button class="tg" id="tb" type="button">Hide</button></div>
-<small><span class="hm">Scroll, pinch or + / −: zoom · Drag, Ctrl + move or Ctrl + scroll: pan</span><span class="ht">Drag: pan · Pinch or double-tap: zoom</span> · Tap a port, route or label for notes · No rotation</small></div>
+<small><span class="hm">Scroll, pinch or + / −: zoom · Double-click: 2× / 4× / reset · Drag, Ctrl + move or Ctrl + scroll: pan</span><span class="ht">Drag: pan · Pinch or double-tap: zoom</span> · Tap a port, route or label for notes · No rotation</small></div>
 <div id="quick">
 <button class="c" id="rp" type="button" title="Report a mistake"><span>⚑ Report</span><span class="lb"> a mistake</span></button>
 <button class="c" id="resetView" type="button">Reset view</button>
@@ -481,15 +481,18 @@ function apply() {
   });
   placeLabels();
 }
-function fitBox(lon0, lat0, lon1, lat1, pad) {
-  cancelAnim();
+function fitTarget(lon0, lat0, lon1, lat1, pad) {   // the view that frames a box (fitBox applies it; the double-click zoom levels use it to find the default view)
   pad = pad == null ? 36 : pad;
   const p1 = proj(lon0, lat1), p2 = proj(lon1, lat0);
   const minx = Math.min(p1[0], p2[0]), maxx = Math.max(p1[0], p2[0]);
   const miny = Math.min(p1[1], p2[1]), maxy = Math.max(p1[1], p2[1]);
   const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight);
   const k = Math.min((w - pad * 2) / (maxx - minx), (h - pad * 2) / (maxy - miny));
-  view = {x: (w - (minx + maxx) * k) / 2, y: (h - (miny + maxy) * k) / 2, k};
+  return {x: (w - (minx + maxx) * k) / 2, y: (h - (miny + maxy) * k) / 2, k};
+}
+function fitBox(lon0, lat0, lon1, lat1, pad) {
+  cancelAnim(); lvlMemo = null;
+  view = fitTarget(lon0, lat0, lon1, lat1, pad);
   apply();
 }
 const VIEWS = {
@@ -527,17 +530,47 @@ const scrollFactor = dy => { const a = Math.min(Math.abs(dy), SCROLL_MAX); retur
 
 var anim = 0;   // var (not let): fitBox() calls cancelAnim() while the page is starting up
 function cancelAnim() { if (anim) { cancelAnimationFrame(anim); anim = 0; } }
-function zoomAnimated(cx, cy, factor) {   // eased zoom about a screen point; any new input cancels it
+function zoomAnimated(cx, cy, factor, ms = ANIM_MS) {   // eased zoom about a screen point; any new input cancels it
   cancelAnim();
   const k0 = view.k, k1 = Math.max(K_MIN, Math.min(K_MAX, k0 * factor));
   if (k1 === k0) return;
   const t0 = performance.now(); let prev = 1;
   const step = now => {
-    const t = Math.max(0, Math.min(1, (now - t0) / ANIM_MS)), f = Math.pow(k1 / k0, 1 - Math.pow(1 - t, 3));
+    const t = Math.max(0, Math.min(1, (now - t0) / ms)), f = Math.pow(k1 / k0, 1 - Math.pow(1 - t, 3));
     zoomAt(cx, cy, f / prev); prev = f;
     anim = t < 1 ? requestAnimationFrame(step) : 0;
   };
   anim = requestAnimationFrame(step);
+}
+
+/* Mouse double-click zoom: steps through fixed levels measured against the default view (the Region view that Reset view restores). The page already
+   measures zoom as view.k / baseScale(), so 1X is the default view, 2X and 4X are twice and four times that. Below 2X -> 2X, from 2X up to just under 4X
+   -> 4X, 4X or more -> back to the full default view. 2X and 4X zoom about the cursor; going back to 1X restores the default framing, so the map recentres.
+   A level within 3% of the current zoom counts as already reached. The maximum zoom is a fixed limit, so on very large screens the 4X level is clamped to it.
+   Free zoom (wheel, pinch, keys) is not involved. Touch has its own double-tap above. */
+const LEVELS = [2, 4], LEVEL_TOL = 1.03;
+var lvlMemo = null;   // {k, t}: where the last double-click animation was heading, so a quick second double-click steps on from there. var: fitBox() clears it at start-up.
+const zoomMs = r => Math.max(260, Math.min(560, 200 + 140 * Math.abs(Math.log2(r))));   // longer for bigger changes
+function animateTo(T, ms) {   // eased move to a complete view {x, y, k}: the scale and the point at the screen centre are interpolated together, so the map glides without a jump
+  cancelAnim();
+  const w = innerWidth, h = innerHeight, v = {x: view.x, y: view.y, k: view.k};
+  const c0 = [(w / 2 - v.x) / v.k, (h / 2 - v.y) / v.k], c1 = [(w / 2 - T.x) / T.k, (h / 2 - T.y) / T.k];
+  const t0 = performance.now();
+  const step = now => {
+    const t = Math.max(0, Math.min(1, (now - t0) / ms)), e = 1 - Math.pow(1 - t, 3);
+    if (t >= 1) { view.x = T.x; view.y = T.y; view.k = T.k; touched = false; }   // arrived at the default view: same state as Reset view
+    else { const k = v.k * Math.pow(T.k / v.k, e); view.k = k; view.x = w / 2 - (c0[0] + (c1[0] - c0[0]) * e) * k; view.y = h / 2 - (c0[1] + (c1[1] - c0[1]) * e) * k; touched = true; }
+    apply();
+    anim = t < 1 ? requestAnimationFrame(step) : 0;
+  };
+  anim = requestAnimationFrame(step);
+}
+function dblClickZoom(cx, cy) {
+  const base = baseScale(), kMax = K_MAX / base, now = performance.now();
+  const k0 = lvlMemo && now - lvlMemo.t < 700 ? lvlMemo.k : view.k;   // a double-click that arrives mid-animation steps on from the level being animated to
+  const next = LEVELS.map(L => Math.min(L, kMax)).find(L => L > k0 / base * LEVEL_TOL);
+  if (next) { const kT = next * base; lvlMemo = {k: kT, t: now}; zoomAnimated(cx, cy, kT / view.k, zoomMs(kT / view.k)); }
+  else { const r = VIEWS.region, T = fitTarget(r[0], r[1], r[2], r[3], 28); lvlMemo = {k: T.k, t: now}; animateTo(T, zoomMs(T.k / view.k)); }
 }
 
 /* Double-tap (touch and pen). The browser's own double-tap page zoom is switched off in CSS, and the page's dblclick event is ignored for touch,
@@ -560,7 +593,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Control') ctrlDown = true;
   const d = KEY_ZOOM[e.key];
   if (!d || e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
-  e.preventDefault(); cancelAnim(); keysHeld.set(e.code, d);
+  e.preventDefault(); cancelAnim(); lvlMemo = null; keysHeld.set(e.code, d);
   if (!keyRaf) { keyT = performance.now(); keyRaf = requestAnimationFrame(keyStep); }
 });
 addEventListener('keyup', e => { if (e.key === 'Control') ctrlDown = false; keysHeld.delete(e.code); });
@@ -667,13 +700,13 @@ svg.addEventListener('pointerleave', () => { hv = null; });
 /* Safari (macOS) reports a trackpad pinch as gesture events, not wheel events. iOS also fires them during a two-finger touch pinch, which the pointer code
    already handles, so they are ignored while any pointer is down. They are always cancelled so Safari cannot zoom the page. */
 let gK = 1, gX = 0, gY = 0;
-svg.addEventListener('gesturestart', e => { e.preventDefault(); cancelAnim(); gK = view.k; gX = Number.isFinite(e.clientX) ? e.clientX : hv ? hv[0] : innerWidth / 2; gY = Number.isFinite(e.clientY) ? e.clientY : hv ? hv[1] : innerHeight / 2; });
+svg.addEventListener('gesturestart', e => { e.preventDefault(); cancelAnim(); lvlMemo = null; gK = view.k; gX = Number.isFinite(e.clientX) ? e.clientX : hv ? hv[0] : innerWidth / 2; gY = Number.isFinite(e.clientY) ? e.clientY : hv ? hv[1] : innerHeight / 2; });
 svg.addEventListener('gesturechange', e => { e.preventDefault(); if (!PT.size && e.scale > 0) zoomAt(gX, gY, gK * Math.pow(e.scale, NAV.pinch) / view.k); });
 svg.addEventListener('gestureend', e => e.preventDefault());
 /* Wheel events. A pinch on Chrome/Edge/Firefox arrives with ctrlKey set even though Ctrl is not pressed, so a wheel event counts as a pinch only when
    ctrlKey is set and the physical Ctrl key is not down. Two-finger scroll / mouse wheel zooms; Ctrl + scroll pans. */
 svg.addEventListener('wheel', e => {
-  e.preventDefault(); cancelAnim();
+  e.preventDefault(); cancelAnim(); lvlMemo = null;
   const u = e.deltaMode === 1 ? LINE_PX : e.deltaMode === 2 ? innerHeight : 1, dx = e.deltaX * u, dy = e.deltaY * u;   // lines/pages to pixels (Firefox reports mouse-wheel notches in lines)
   const pinch = e.ctrlKey && !ctrlDown;
   if (NAVDEBUG) console.log('wheel', {dx:e.deltaX, dy:e.deltaY, mode:e.deltaMode, ctrl:e.ctrlKey, ctrlKeyDown:ctrlDown, as:pinch ? 'pinch' : e.ctrlKey ? 'pan' : 'zoom'});
@@ -682,7 +715,7 @@ svg.addEventListener('wheel', e => {
   else if (dy) zoomAt(e.clientX, e.clientY, scrollFactor(dy));                                                            // plain scroll or mouse wheel: zoom
 }, {passive:false});
 svg.addEventListener('contextmenu', e => e.preventDefault());
-svg.addEventListener('dblclick', e => { if (performance.now() - lastTouchUp < 800) return; zoomAnimated(e.clientX, e.clientY, 1.6); });   // mouse only: touch has its own double-tap above
+svg.addEventListener('dblclick', e => { if (performance.now() - lastTouchUp < 800) return; dblClickZoom(e.clientX, e.clientY); });   // mouse only: touch has its own double-tap above
 addEventListener('resize', () => { if (!touched) setView('region'); else apply(); });
 
 /* ---------- notes (wording for shared features kept from the existing atlas) ---------- */
